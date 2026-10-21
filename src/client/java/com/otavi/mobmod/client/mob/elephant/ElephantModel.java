@@ -1,5 +1,6 @@
 package com.otavi.mobmod.client.mob.elephant;
 
+import com.otavi.mobmod.entity.genetics.Sex;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartNames;
@@ -12,22 +13,38 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
 /**
+ * African elephant with real-life proportions: about 3 blocks tall at the shoulder, legs close to half the height,
+ * body longer than tall, a trunk that almost reaches the ground and large flat ears on the sides of the head.
+ * <p>
  * Adult and calf share this model: the calf layer is the adult one scaled down by half.
- * Every animation is procedural (no keyframes), like Promenade's duck.
+ * Males are bigger through the scale attribute and show the long tusks; females show the short ones.
+ * Every animation is procedural (no keyframes). UV layout (256x256) is documented in tools/textures/ElephantTexture.java.
  */
 public class ElephantModel extends EntityModel<ElephantRenderState> {
     public static final String TRUNK = "trunk";
+    public static final String TRUNK_MIDDLE = "trunk_middle";
     public static final String TRUNK_TIP = "trunk_tip";
     public static final String RIGHT_TUSK = "right_tusk";
     public static final String LEFT_TUSK = "left_tusk";
+    public static final String RIGHT_LONG_TUSK = "right_long_tusk";
+    public static final String LEFT_LONG_TUSK = "left_long_tusk";
+
+    public static final int TEXTURE_SIZE = 256;
 
     private static final MeshTransformer CALF_TRANSFORMER = MeshTransformer.scaling(0.5F);
 
+    private static final float TRUNK_PITCH = -0.12F;
+
     private final ModelPart head;
     private final ModelPart trunk;
+    private final ModelPart trunkMiddle;
     private final ModelPart trunkTip;
     private final ModelPart rightEar;
     private final ModelPart leftEar;
+    private final ModelPart rightTusk;
+    private final ModelPart leftTusk;
+    private final ModelPart rightLongTusk;
+    private final ModelPart leftLongTusk;
     private final ModelPart tail;
     private final ModelPart rightHindLeg;
     private final ModelPart leftHindLeg;
@@ -38,9 +55,14 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
         super(root);
         this.head = root.getChild(PartNames.HEAD);
         this.trunk = this.head.getChild(TRUNK);
-        this.trunkTip = this.trunk.getChild(TRUNK_TIP);
+        this.trunkMiddle = this.trunk.getChild(TRUNK_MIDDLE);
+        this.trunkTip = this.trunkMiddle.getChild(TRUNK_TIP);
         this.rightEar = this.head.getChild(PartNames.RIGHT_EAR);
         this.leftEar = this.head.getChild(PartNames.LEFT_EAR);
+        this.rightTusk = this.head.getChild(RIGHT_TUSK);
+        this.leftTusk = this.head.getChild(LEFT_TUSK);
+        this.rightLongTusk = this.head.getChild(RIGHT_LONG_TUSK);
+        this.leftLongTusk = this.head.getChild(LEFT_LONG_TUSK);
         this.tail = root.getChild(PartNames.BODY).getChild(PartNames.TAIL);
         this.rightHindLeg = root.getChild(PartNames.RIGHT_HIND_LEG);
         this.leftHindLeg = root.getChild(PartNames.LEFT_HIND_LEG);
@@ -52,36 +74,46 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
+        // Body: 26 wide, 26 tall, 40 long, from y=-22 to y=4 (the ground is y=24)
         PartDefinition body = root.addOrReplaceChild(PartNames.BODY, CubeListBuilder.create()
-                .texOffs(0, 0).addBox(-10.0F, -10.0F, -16.0F, 20.0F, 22.0F, 32.0F), PartPose.offset(0.0F, 2.0F, 0.0F));
+                .texOffs(0, 0).addBox(-13.0F, -26.0F, -20.0F, 26.0F, 26.0F, 40.0F), PartPose.offset(0.0F, 4.0F, 0.0F));
         body.addOrReplaceChild(PartNames.TAIL, CubeListBuilder.create()
-                .texOffs(48, 80).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 12.0F, 2.0F), PartPose.offsetAndRotation(0.0F, -6.0F, 16.0F, 0.2F, 0.0F, 0.0F));
+                .texOffs(30, 106).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 14.0F, 2.0F), PartPose.offsetAndRotation(0.0F, -22.0F, 20.0F, 0.15F, 0.0F, 0.0F));
 
-        CubeListBuilder leg = CubeListBuilder.create().texOffs(0, 56).addBox(-4.0F, 0.0F, -4.0F, 8.0F, 12.0F, 8.0F);
-        root.addOrReplaceChild(PartNames.RIGHT_HIND_LEG, leg, PartPose.offset(-6.0F, 12.0F, 11.0F));
-        root.addOrReplaceChild(PartNames.LEFT_HIND_LEG, leg, PartPose.offset(6.0F, 12.0F, 11.0F));
-        root.addOrReplaceChild(PartNames.RIGHT_FRONT_LEG, leg, PartPose.offset(-6.0F, 12.0F, -11.0F));
-        root.addOrReplaceChild(PartNames.LEFT_FRONT_LEG, leg, PartPose.offset(6.0F, 12.0F, -11.0F));
+        // Legs: columns 22 tall, close to half of the shoulder height like a real elephant
+        CubeListBuilder leg = CubeListBuilder.create().texOffs(0, 70).addBox(-5.0F, 0.0F, -5.0F, 10.0F, 22.0F, 10.0F);
+        root.addOrReplaceChild(PartNames.RIGHT_HIND_LEG, leg, PartPose.offset(-7.5F, 2.0F, 13.0F));
+        root.addOrReplaceChild(PartNames.LEFT_HIND_LEG, leg, PartPose.offset(7.5F, 2.0F, 13.0F));
+        root.addOrReplaceChild(PartNames.RIGHT_FRONT_LEG, leg, PartPose.offset(-7.5F, 2.0F, -13.0F));
+        root.addOrReplaceChild(PartNames.LEFT_FRONT_LEG, leg, PartPose.offset(7.5F, 2.0F, -13.0F));
 
+        // Head: in front of the body, its top just under the shoulders
         PartDefinition head = root.addOrReplaceChild(PartNames.HEAD, CubeListBuilder.create()
-                .texOffs(32, 56).addBox(-7.0F, -8.0F, -9.0F, 14.0F, 14.0F, 10.0F), PartPose.offset(0.0F, -1.0F, -16.0F));
+                .texOffs(44, 70).addBox(-9.0F, -10.0F, -12.0F, 18.0F, 16.0F, 12.0F), PartPose.offset(0.0F, -11.0F, -19.0F));
 
+        // Trunk: three segments hanging almost to the ground, slightly forward
         PartDefinition trunk = head.addOrReplaceChild(TRUNK, CubeListBuilder.create()
-                .texOffs(80, 56).addBox(-2.0F, 0.0F, -3.0F, 4.0F, 9.0F, 4.0F), PartPose.offset(0.0F, 3.0F, -9.0F));
-        trunk.addOrReplaceChild(TRUNK_TIP, CubeListBuilder.create()
-                .texOffs(96, 56).addBox(-1.5F, 0.0F, -1.5F, 3.0F, 7.0F, 3.0F), PartPose.offset(0.0F, 9.0F, -1.0F));
+                .texOffs(104, 70).addBox(-3.0F, 0.0F, -3.0F, 6.0F, 10.0F, 6.0F), PartPose.offsetAndRotation(0.0F, 3.0F, -9.0F, TRUNK_PITCH, 0.0F, 0.0F));
+        PartDefinition trunkMiddle = trunk.addOrReplaceChild(TRUNK_MIDDLE, CubeListBuilder.create()
+                .texOffs(132, 70).addBox(-2.5F, 0.0F, -2.5F, 5.0F, 9.0F, 5.0F), PartPose.offset(0.0F, 9.5F, 0.0F));
+        trunkMiddle.addOrReplaceChild(TRUNK_TIP, CubeListBuilder.create()
+                .texOffs(156, 70).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 8.0F, 4.0F), PartPose.offset(0.0F, 8.5F, 0.0F));
 
-        CubeListBuilder tusk = CubeListBuilder.create().texOffs(108, 56).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 6.0F, 2.0F);
-        head.addOrReplaceChild(RIGHT_TUSK, tusk, PartPose.offsetAndRotation(-4.0F, 4.0F, -7.0F, -0.6F, 0.0F, 0.0F));
-        head.addOrReplaceChild(LEFT_TUSK, tusk, PartPose.offsetAndRotation(4.0F, 4.0F, -7.0F, -0.6F, 0.0F, 0.0F));
+        // Tusks: forward and down from the base of the trunk. Females have short ones, males long ones
+        CubeListBuilder tusk = CubeListBuilder.create().texOffs(176, 70).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 9.0F, 2.0F);
+        head.addOrReplaceChild(RIGHT_TUSK, tusk, PartPose.offsetAndRotation(-4.5F, 4.0F, -10.0F, -0.9F, 0.0F, 0.1F));
+        head.addOrReplaceChild(LEFT_TUSK, tusk, PartPose.offsetAndRotation(4.5F, 4.0F, -10.0F, -0.9F, 0.0F, -0.1F));
+        CubeListBuilder longTusk = CubeListBuilder.create().texOffs(188, 70).addBox(-1.0F, 0.0F, -1.0F, 2.0F, 13.0F, 2.0F);
+        head.addOrReplaceChild(RIGHT_LONG_TUSK, longTusk, PartPose.offsetAndRotation(-4.5F, 4.0F, -10.0F, -0.9F, 0.0F, 0.1F));
+        head.addOrReplaceChild(LEFT_LONG_TUSK, longTusk, PartPose.offsetAndRotation(4.5F, 4.0F, -10.0F, -0.9F, 0.0F, -0.1F));
 
-        // Ears sweep slightly backwards; they flap around that resting angle
+        // Ears: large flat panels behind the eyes, flush with the sides of the body like the reference; they fan outwards
         head.addOrReplaceChild(PartNames.RIGHT_EAR, CubeListBuilder.create()
-                .texOffs(0, 80).addBox(-9.0F, -2.0F, 0.0F, 9.0F, 12.0F, 1.0F), PartPose.offsetAndRotation(-7.0F, -4.0F, -4.0F, 0.0F, 0.3F, 0.0F));
+                .texOffs(0, 106).addBox(-1.0F, 0.0F, 0.0F, 1.0F, 15.0F, 13.0F), PartPose.offset(-13.0F, -9.0F, -5.0F));
         head.addOrReplaceChild(PartNames.LEFT_EAR, CubeListBuilder.create()
-                .texOffs(0, 80).mirror().addBox(0.0F, -2.0F, 0.0F, 9.0F, 12.0F, 1.0F), PartPose.offsetAndRotation(7.0F, -4.0F, -4.0F, 0.0F, -0.3F, 0.0F));
+                .texOffs(0, 106).mirror().addBox(0.0F, 0.0F, 0.0F, 1.0F, 15.0F, 13.0F), PartPose.offset(13.0F, -9.0F, -5.0F));
 
-        return LayerDefinition.create(mesh, 128, 128);
+        return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
     }
 
     public static LayerDefinition createCalfLayer() {
@@ -93,38 +125,47 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
         // Resets every part to its default pose: rotations below are relative to it
         super.setupAnim(state);
 
+        boolean male = state.sex == Sex.MALE;
+        this.rightTusk.visible = !male;
+        this.leftTusk.visible = !male;
+        this.rightLongTusk.visible = male;
+        this.leftLongTusk.visible = male;
+
         float age = state.ageInTicks;
 
-        // Head follows where the elephant looks
-        this.head.xRot = state.xRot * Mth.DEG_TO_RAD;
-        this.head.yRot = state.yRot * Mth.DEG_TO_RAD;
+        // Head follows where the elephant looks, within what a heavy neck allows
+        this.head.xRot = state.xRot * Mth.DEG_TO_RAD * 0.5F;
+        this.head.yRot = Mth.clamp(state.yRot, -40.0F, 40.0F) * Mth.DEG_TO_RAD;
 
-        // Heavy, slow steps: diagonal legs move together
+        // Heavy, slow steps: diagonal legs move together, with a smaller swing than for small animals
         float pos = state.walkAnimationPos;
         float speed = state.walkAnimationSpeed;
-        float swing = Mth.cos(pos * 0.6662F) * 1.0F * speed;
+        float swing = Mth.cos(pos * 0.5F) * 0.7F * speed;
         this.rightHindLeg.xRot = swing;
         this.leftFrontLeg.xRot = swing;
         this.leftHindLeg.xRot = -swing;
         this.rightFrontLeg.xRot = -swing;
 
-        // Idle: trunk sways, ears fan, tail swishes
-        this.trunk.xRot = Mth.sin(age * 0.05F) * 0.1F + swing * 0.3F;
-        this.trunk.zRot = Mth.cos(age * 0.04F) * 0.08F;
-        this.trunkTip.xRot = Mth.sin(age * 0.05F + 1.0F) * 0.15F;
+        // Idle: trunk sways along its whole length, ears fan, tail swishes
+        this.trunk.xRot += Mth.sin(age * 0.05F) * 0.06F + swing * 0.2F;
+        this.trunk.zRot = Mth.cos(age * 0.04F) * 0.05F;
+        this.trunkMiddle.xRot = Mth.sin(age * 0.05F + 0.8F) * 0.08F;
+        this.trunkTip.xRot = Mth.sin(age * 0.05F + 1.6F) * 0.12F;
 
-        float earFlap = Mth.sin(age * 0.15F) * 0.15F;
-        this.rightEar.yRot += earFlap;
-        this.leftEar.yRot -= earFlap;
+        // Ears only fan outwards, so they never go through the body
+        float earFlap = Math.abs(Mth.sin(age * 0.08F)) * 0.3F;
+        this.rightEar.yRot = -earFlap;
+        this.leftEar.yRot = earFlap;
 
         this.tail.zRot = Mth.sin(age * 0.1F) * 0.2F;
 
         // Attack: rear the head and curl the trunk up, then swing back down
         if (state.attackProgress > 0.0F) {
             float lift = Mth.sin(state.attackProgress * Mth.PI);
-            this.head.xRot -= lift * 0.6F;
-            this.trunk.xRot -= lift * 1.2F;
-            this.trunkTip.xRot -= lift * 0.8F;
+            this.head.xRot -= lift * 0.5F;
+            this.trunk.xRot -= lift * 1.0F;
+            this.trunkMiddle.xRot -= lift * 0.7F;
+            this.trunkTip.xRot -= lift * 0.6F;
         }
     }
 }

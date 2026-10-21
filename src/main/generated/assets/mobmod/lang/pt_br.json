@@ -1,5 +1,10 @@
 {
   "entity.mobmod.elephant": "Elefante",
   "item.mobmod.elephant_spawn_egg": "Ovo Gerador de Elefante",
+  "mobmod.sex.female": "Fêmea",
+  "mobmod.sex.male": "Macho",
+  "mobmod.skin_variant.albino": "Albino",
+  "mobmod.skin_variant.melanistic": "Melânico",
+  "mobmod.skin_variant.normal": "Normal",
   "tag.item.mobmod.elephant_food": "Comida para Elefantes"
 }

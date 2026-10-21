@@ -23,7 +23,8 @@ public final class ElephantMob {
     public static final TagKey<Item> FOOD = TagKey.create(Registries.ITEM, MobMod.id("elephant_food"));
 
     public static final MobDefinition<Elephant> DEFINITION = MobDefinition.builder("elephant", Elephant::new, MobCategory.CREATURE)
-            .type(type -> type.sized(1.8f, 2.2f).eyeHeight(1.9f).clientTrackingRange(10))
+            // About 3 blocks tall at the shoulder like a real female African elephant; males are 15% bigger (ModAnimal)
+            .type(type -> type.sized(2.6f, 3.0f).eyeHeight(2.6f).clientTrackingRange(10))
             .attributes(Elephant::createElephantAttributes)
             .spawn(SpawnRule.animal(BiomeTags.IS_SAVANNA, 5, 2, 4))
             .name("Elephant", "Elefante")

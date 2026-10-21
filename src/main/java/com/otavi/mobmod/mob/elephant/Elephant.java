@@ -7,9 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -21,17 +19,16 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.animal.Animal;
+import com.otavi.mobmod.entity.genetics.ModAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A neutral savanna animal: it wanders in herds and only fights back when it, or a calf of its herd, gets hurt.
  */
-public class Elephant extends Animal {
+public class Elephant extends ModAnimal {
     private static final byte ATTACK_EVENT = 4;
     public static final int ATTACK_ANIMATION_LENGTH = 10;
 
@@ -74,12 +71,6 @@ public class Elephant extends Animal {
     @Override
     public boolean isFood(ItemStack stack) {
         return stack.is(ElephantMob.FOOD);
-    }
-
-    @Nullable
-    @Override
-    public Elephant getBreedOffspring(ServerLevel level, AgeableMob partner) {
-        return ElephantMob.TYPE.create(level, EntitySpawnReason.BREEDING);
     }
 
     /*============*/

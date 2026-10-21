@@ -4,7 +4,7 @@ Exemplo para um mob chamado `zebra`. Use o Elefante (`mob/elephant`) como refer�
 
 ## 1. Lado comum: `src/main/java/com/otavi/mobmod/mob/zebra/`
 
-**`Zebra.java`**: a entidade (estende `Animal`, `Monster`, etc.), com `createZebraAttributes()` e `registerGoals()`. Goals reaproveitáveis ficam em `entity/goal/`.
+**`Zebra.java`**: a entidade. Animais estendem **`ModAnimal`**, que já traz sexo, variantes de pele e a reprodução macho + fêmea (veja [genetica.md](genetica.md)); não implemente `getBreedOffspring`. Defina `createZebraAttributes()` e `registerGoals()`. Goals reaproveitáveis ficam em `entity/goal/`.
 
 **`ZebraMob.java`**: a definição, que é a única fonte de verdade do mob:
 
@@ -29,9 +29,9 @@ Opcionais do builder: `spawnEggAfter(Items.X)` (posição na aba criativa; sem e
 
 ## 2. Lado cliente: `src/client/java/com/otavi/mobmod/client/mob/zebra/`
 
-- `ZebraModel.java`: modelo em código (`createLayer()`), animações em `setupAnim`.
-- `ZebraRenderState.java`: só se precisar de dados extras para animar.
-- `ZebraRenderer.java`: textura e criação do render state.
+- `ZebraModel.java`: modelo em código (`createLayer()`), animações em `setupAnim`. O render state traz `sex` e `skinVariant` se o modelo precisar mudar algo por sexo (como as presas do elefante).
+- `ZebraRenderState.java`: estende `ModMobRenderState`.
+- `ZebraRenderer.java`: estende `ModMobRenderer`, que já escolhe a textura da variante e desenha a barra de informações (nome, vida e sexo).
 - `ZebraClient.java`:
 
 ```java
@@ -55,7 +55,7 @@ São as **únicas** alterações fora das pastas do mob.
 
 ## 4. Texturas (`src/client/resources/assets/mobmod/textures/`)
 
-- `entity/zebra/zebra.png`
+- `entity/zebra/zebra.png`, `zebra_albino.png` e `zebra_melanistic.png` (as três variantes de pele são obrigatórias)
 - `item/zebra_spawn_egg.png`
 
 ## 5. Gerar dados e testar

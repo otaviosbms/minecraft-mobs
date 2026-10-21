@@ -1,6 +1,9 @@
 package com.otavi.mobmod.client.datagen;
 
 import com.otavi.mobmod.core.ModMobs;
+import com.otavi.mobmod.core.Translation;
+import com.otavi.mobmod.entity.genetics.Sex;
+import com.otavi.mobmod.entity.genetics.SkinVariant;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
@@ -17,6 +20,12 @@ public class ModLanguageProvider extends FabricLanguageProvider {
 
     @Override
     public void generateTranslations(HolderLookup.Provider registries, TranslationBuilder builder) {
+        builder.add(Sex.MALE.translationKey(), new Translation("Male", "Macho").get(this.locale));
+        builder.add(Sex.FEMALE.translationKey(), new Translation("Female", "Fêmea").get(this.locale));
+        builder.add(SkinVariant.NORMAL.translationKey(), new Translation("Normal", "Normal").get(this.locale));
+        builder.add(SkinVariant.ALBINO.translationKey(), new Translation("Albino", "Albino").get(this.locale));
+        builder.add(SkinVariant.MELANISTIC.translationKey(), new Translation("Melanistic", "Melânico").get(this.locale));
+
         for (var mob : ModMobs.ALL) {
             var name = mob.displayName().get(this.locale);
             builder.add(mob.type(), name);

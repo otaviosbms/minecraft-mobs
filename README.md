@@ -15,11 +15,22 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 
 ### Elefante (`mobmod:elephant`)
 
+- **Tamanho:** cerca de 3 blocos de altura, com proporções de um elefante africano. Machos são 15% maiores e têm presas mais longas.
 - **Comportamento:** neutro. Vive em manadas e só ataca se for ferido ou se um filhote da manada for ferido. Filhotes não lutam: fogem em pânico e chamam os adultos.
 - **Atributos:** 60 de vida, 8 de dano, resistência alta a knockback e sobe blocos de altura 1.
 - **Spawn:** biomas de savana, em grupos de 2 a 4.
-- **Reprodução:** alimentado com os itens da tag `mobmod:elephant_food`, que também o atraem.
+- **Reprodução:** alimentado com os itens da tag `mobmod:elephant_food`, que também o atraem. Só um macho e uma fêmea geram filhotes.
 - **Extras:** ovo de spawn na aba criativa (Spawn Eggs), loot table própria e traduções em inglês e português (BR).
+
+### Para todos os mobs
+
+- **Sexo:** macho ou fêmea, com reprodução igual à vanilla, mas só entre sexos opostos.
+- **Variantes de pele:** albino e melânico (1% cada), herdadas dos pais.
+- **Barra de informações:** nome, sexo (♂/♀) e vida acima do mob, no estilo Mo'Creatures.
+
+![Variantes do elefante](docs/imagens/elefante-variantes.png)
+
+Detalhes em [genetica.md](docs/projeto/genetica.md).
 
 ## Como usar
 
@@ -62,6 +73,7 @@ Adicionar um mob é criar as duas pastas dele, colocar uma linha em `ModMobs` e 
 - [Índice da documentação](docs/README.md)
 - [Visão geral do projeto](docs/projeto/visao-geral.md)
 - [Como adicionar um mob](docs/projeto/como-adicionar-um-mob.md)
+- [Genética: sexo, reprodução e variantes](docs/projeto/genetica.md)
 - [Análise dos mobs do Promenade](docs/analises/analise-mobs-promenade.md) (referência usada na criação do mod)
 
 ## Licença

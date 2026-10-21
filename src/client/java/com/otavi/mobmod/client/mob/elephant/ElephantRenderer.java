@@ -1,32 +1,26 @@
 package com.otavi.mobmod.client.mob.elephant;
 
-import com.otavi.mobmod.MobMod;
+import com.otavi.mobmod.client.core.ModMobRenderer;
 import com.otavi.mobmod.mob.elephant.Elephant;
-import net.minecraft.client.renderer.entity.AgeableMobRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.Identifier;
 
-public class ElephantRenderer extends AgeableMobRenderer<Elephant, ElephantRenderState, ElephantModel> {
-    // The calf model is a scaled-down adult, so both share the same UV layout and texture
-    private static final Identifier TEXTURE = MobMod.id("textures/entity/elephant/elephant.png");
-
+/**
+ * Textures come from {@link ModMobRenderer}: elephant.png, elephant_albino.png and elephant_melanistic.png.
+ * The calf model is a scaled-down adult, so both share the same UV layout.
+ */
+public class ElephantRenderer extends ModMobRenderer<Elephant, ElephantRenderState, ElephantModel> {
     public ElephantRenderer(EntityRendererProvider.Context context) {
         super(
                 context,
                 new ElephantModel(context.bakeLayer(ElephantClient.ADULT_LAYER)),
                 new ElephantModel(context.bakeLayer(ElephantClient.BABY_LAYER)),
-                1.2F
+                1.8F
         );
     }
 
     @Override
     public ElephantRenderState createRenderState() {
         return new ElephantRenderState();
-    }
-
-    @Override
-    public Identifier getTextureLocation(ElephantRenderState state) {
-        return TEXTURE;
     }
 
     @Override
