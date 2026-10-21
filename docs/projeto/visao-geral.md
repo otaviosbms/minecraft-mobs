@@ -1,6 +1,6 @@
 # Visão geral do projeto
 
-Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona um mob: o **Elefante** (`mobmod:elephant`), com ovo de spawn. Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
+Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona dois mobs, cada um com ovo de spawn: o **Elefante** (`mobmod:elephant`) e o **Chimpanzé** (`mobmod:chimpanzee`). As fichas completas estão em [docs/mobs](../mobs/README.md). Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
 
 A arquitetura foi pensada para **dezenas de mobs**: cada mob vive no seu próprio pacote e é declarado uma única vez numa `MobDefinition`; o resto (registro, spawn, aba criativa, traduções, loot, tags, modelos de item e testes) é derivado dessa definição. Para o passo a passo, veja [como-adicionar-um-mob.md](como-adicionar-um-mob.md).
 
@@ -22,7 +22,7 @@ minecraft-mobs/
 │   └── client/
 │       ├── java/           Código só do cliente (renderers, modelos, datagen)
 │       └── resources/      Texturas (únicos assets escritos à mão)
-├── tools/textures/         Geradores das texturas (ex.: ElephantTexture.java)
+├── tools/textures/         Geradores das texturas (MobTexture + um gerador por mob)
 ├── build/                  GERADO – classes, libs/mobmod-<versão>.jar, gametest
 └── .gradle/                GERADO – cache do Gradle/Loom
 ```
@@ -96,10 +96,18 @@ Para trocar de versão do Minecraft/Fabric, edite apenas `gradle.properties`.
 
 ## Texturas
 
-As texturas do elefante são geradas por `tools/textures/ElephantTexture.java`, que também documenta o layout UV 256×256 do modelo:
+As texturas são geradas por código em `tools/textures/`, todas no mesmo estilo artístico:
+
+| Arquivo | Função |
+|---|---|
+| `MobTexture.java` | Base comum: ruído em duas camadas, estrias, rugas em espiral, faces de cima mais claras e de baixo mais escuras, uma paleta por variante e o ovo de spawn |
+| `ElephantTexture.java` | Elefante (256×256) |
+| `ChimpanzeeTexture.java` | Chimpanzé (128×128) e o ovo dele |
+
+Cada gerador documenta no topo o layout UV do modelo e grava `<mob>.png`, `<mob>_albino.png` e `<mob>_melanistic.png` com o mesmo desenho e paletas diferentes. Rode da raiz do projeto, passando a pasta de texturas:
 
 ```bash
-java tools/textures/ElephantTexture.java src/client/resources/assets/mobmod/textures/entity/elephant
+java tools/textures/ChimpanzeeTexture.java src/client/resources/assets/mobmod/textures
 ```
 
-Ele grava `elephant.png`, `elephant_albino.png` e `elephant_melanistic.png` com o mesmo desenho e paletas diferentes. Qualquer PNG pode ser trocado por arte feita à mão (ex.: Blockbench), desde que mantenha o layout UV.
+Qualquer PNG pode ser trocado por arte feita à mão (ex.: Blockbench), desde que mantenha o layout UV.

@@ -58,6 +58,8 @@ São as **únicas** alterações fora das pastas do mob.
 - `entity/zebra/zebra.png`, `zebra_albino.png` e `zebra_melanistic.png` (as três variantes de pele são obrigatórias)
 - `item/zebra_spawn_egg.png`
 
+Para manter o estilo dos outros mobs, crie `tools/textures/ZebraTexture.java` estendendo `MobTexture` (veja `ChimpanzeeTexture.java`): ele gera as três variantes e o ovo.
+
 ## 5. Gerar dados e testar
 
 ```bash

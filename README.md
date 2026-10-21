@@ -1,6 +1,6 @@
 # Minecraft Mobs
 
-Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefante**, um animal neutro das savanas.
+Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefante**, das savanas, e o **Chimpanzé**, das selvas.
 
 | | |
 |---|---|
@@ -22,6 +22,17 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 - **Reprodução:** alimentado com os itens da tag `mobmod:elephant_food`, que também o atraem. Só um macho e uma fêmea geram filhotes.
 - **Extras:** ovo de spawn na aba criativa (Spawn Eggs), loot table própria e traduções em inglês e português (BR).
 
+### Chimpanzé (`mobmod:chimpanzee`)
+
+- **Tamanho:** cerca de 1,4 bloco de altura, andando de quatro apoiado nos nós dos dedos. Machos são 15% maiores; fêmeas adultas têm o inchaço vermelho na traseira.
+- **Comportamento:** neutro. Vive em bandos de 3 a 6, escala paredes e árvores como uma aranha, e o bando defende quem for atacado.
+- **Atributos:** 24 de vida, 4 de dano, velocidade 0.3.
+- **Spawn:** biomas de selva.
+- **Reprodução:** maçã, fatia de melancia, bagas doces, bagas brilhantes e sementes de cacau. Só um macho e uma fêmea geram filhotes.
+- **Drops:** nenhum item.
+
+Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chimpanze.md).
+
 ### Para todos os mobs
 
 - **Sexo:** macho ou fêmea, com reprodução igual à vanilla, mas só entre sexos opostos.
@@ -29,6 +40,7 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 - **Barra de informações:** nome, sexo (♂/♀) e vida acima do mob, no estilo Mo'Creatures.
 
 ![Variantes do elefante](docs/imagens/elefante-variantes.png)
+![Variantes do chimpanzé](docs/imagens/chimpanze-variantes.png)
 
 Detalhes em [genetica.md](docs/projeto/genetica.md). Cada mob tem sua ficha completa em [docs/mobs](docs/mobs/README.md).
 

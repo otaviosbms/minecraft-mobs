@@ -1,10 +1,13 @@
 {
+  "entity.mobmod.chimpanzee": "Chimpanzee",
   "entity.mobmod.elephant": "Elephant",
+  "item.mobmod.chimpanzee_spawn_egg": "Chimpanzee Spawn Egg",
   "item.mobmod.elephant_spawn_egg": "Elephant Spawn Egg",
   "mobmod.sex.female": "Female",
   "mobmod.sex.male": "Male",
   "mobmod.skin_variant.albino": "Albino",
   "mobmod.skin_variant.melanistic": "Melanistic",
   "mobmod.skin_variant.normal": "Normal",
+  "tag.item.mobmod.chimpanzee_food": "Food for Chimpanzees",
   "tag.item.mobmod.elephant_food": "Food for Elephants"
 }

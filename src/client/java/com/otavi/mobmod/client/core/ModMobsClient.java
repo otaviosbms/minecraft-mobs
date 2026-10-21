@@ -1,5 +1,6 @@
 package com.otavi.mobmod.client.core;
 
+import com.otavi.mobmod.client.mob.chimpanzee.ChimpanzeeClient;
 import com.otavi.mobmod.client.mob.elephant.ElephantClient;
 import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -17,7 +18,8 @@ import java.util.function.Supplier;
  */
 public final class ModMobsClient {
     public static final List<ClientMob> ALL = List.of(
-            new ElephantClient()
+            new ElephantClient(),
+            new ChimpanzeeClient()
     );
 
     private ModMobsClient() {

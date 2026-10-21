@@ -1,5 +1,6 @@
 package com.otavi.mobmod.core;
 
+import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
 import com.otavi.mobmod.mob.elephant.ElephantMob;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.world.item.CreativeModeTab;
@@ -13,7 +14,8 @@ import java.util.List;
  */
 public final class ModMobs {
     public static final List<MobDefinition<?>> ALL = List.of(
-            ElephantMob.DEFINITION
+            ElephantMob.DEFINITION,
+            ChimpanzeeMob.DEFINITION
     );
 
     private ModMobs() {

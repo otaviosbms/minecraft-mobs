@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mobmod:item/chimpanzee_spawn_egg"
+  }
+}

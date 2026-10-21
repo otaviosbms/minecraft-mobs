@@ -5,6 +5,7 @@ Ficha completa de cada mob do mod: atributos, IA, reprodução, variantes, spawn
 | Mob | ID | Temperamento | Biomas | Vida | Tamanho (fêmea) |
 |---|---|---|---|---|---|
 | [Elefante](elefante.md) | `mobmod:elephant` | Neutro | Savanas | 60 | 2.6 × 3.0 |
+| [Chimpanzé](chimpanze.md) | `mobmod:chimpanzee` | Neutro | Selvas | 24 | 1.0 × 1.4 |
 
 Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md).
 
