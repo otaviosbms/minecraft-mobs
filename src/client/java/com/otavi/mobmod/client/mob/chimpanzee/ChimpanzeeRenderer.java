@@ -13,7 +13,7 @@ public class ChimpanzeeRenderer extends ModMobRenderer<Chimpanzee, ChimpanzeeRen
                 context,
                 new ChimpanzeeModel(context.bakeLayer(ChimpanzeeClient.ADULT_LAYER)),
                 new ChimpanzeeModel(context.bakeLayer(ChimpanzeeClient.BABY_LAYER)),
-                0.6F
+                0.45F
         );
     }
 
@@ -27,6 +27,8 @@ public class ChimpanzeeRenderer extends ModMobRenderer<Chimpanzee, ChimpanzeeRen
         super.extractRenderState(chimpanzee, state, partialTick);
         int tick = chimpanzee.getAttackAnimationTick();
         state.attackProgress = tick > 0 ? Math.max(0.0F, (tick - partialTick) / Chimpanzee.ATTACK_ANIMATION_LENGTH) : 0.0F;
+        int hoot = chimpanzee.getHootTick();
+        state.hootProgress = hoot > 0 ? Math.max(0.0F, (hoot - partialTick) / Chimpanzee.HOOT_LENGTH) : 0.0F;
         state.climbing = chimpanzee.onClimbable() && !chimpanzee.onGround();
     }
 }

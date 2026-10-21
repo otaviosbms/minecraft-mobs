@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.BreedGoal;
@@ -29,18 +30,37 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * A neutral jungle ape: it lives in troops, climbs walls and trees like a spider, and the whole troop
  * fights back when one of them gets hurt.
+ * <p>
+ * It never walks off a ledge higher than {@link #SAFE_DROP} blocks by accident (wandering, following, fleeing),
+ * so it does not fall from the treetops it climbs. Only while chasing a target it may jump down.
  */
 public class Chimpanzee extends ModAnimal {
     private static final EntityDataAccessor<Boolean> DATA_CLIMBING = SynchedEntityData.defineId(Chimpanzee.class, EntityDataSerializers.BOOLEAN);
 
     private static final byte ATTACK_EVENT = 4;
+    private static final byte HOOT_EVENT = 5;
     public static final int ATTACK_ANIMATION_LENGTH = 10;
+    public static final int HOOT_LENGTH = 20;
+
+    /**
+     * Highest drop (in blocks) the chimpanzee walks down on its own.
+     */
+    public static final int SAFE_DROP = 2;
+    private static final double EDGE_STEP = 0.05;
+    /**
+     * How far inside its hitbox the chimpanzee must still have ground under it: a sliver of support at the very edge
+     * of the block would not hold it.
+     */
+    private static final double EDGE_MARGIN = 0.15;
 
     private int attackAnimationTick;
+    private int hootTick;
 
     public Chimpanzee(EntityType<? extends Chimpanzee> type, Level level) {
         super(type, level);
@@ -109,6 +129,63 @@ public class Chimpanzee extends ModAnimal {
         return this.entityData.get(DATA_CLIMBING);
     }
 
+    /*================*/
+    /*   FALL SAFETY  */
+    /*================*/
+
+    @Override
+    public int getMaxFallDistance() {
+        // Paths never plan a drop higher than the edge guard allows, so the chimpanzee never gets stuck following one
+        return this.isChasing() ? super.getMaxFallDistance() : SAFE_DROP;
+    }
+
+    /**
+     * Same idea as a sneaking player: movement that would take the chimpanzee over a ledge higher than
+     * {@link #SAFE_DROP} is cut back, one small step at a time on each axis, until it stays on solid ground.
+     */
+    @Override
+    protected Vec3 maybeBackOffFromEdge(Vec3 movement, MoverType type) {
+        if (type != MoverType.SELF || movement.y > 0.0 || !this.onGround() || this.onClimbable() || this.isChasing()) {
+            return movement;
+        }
+        // Already hanging over the edge (pushed, knocked back...): never lock it in place, let it move back or fall
+        if (this.isAboveDrop(0.0, 0.0)) {
+            return movement;
+        }
+        double dx = movement.x;
+        double dz = movement.z;
+        while (dx != 0.0 && this.isAboveDrop(dx, 0.0)) {
+            dx = stepBack(dx);
+        }
+        while (dz != 0.0 && this.isAboveDrop(0.0, dz)) {
+            dz = stepBack(dz);
+        }
+        while (dx != 0.0 && dz != 0.0 && this.isAboveDrop(dx, dz)) {
+            dx = stepBack(dx);
+            dz = stepBack(dz);
+        }
+        return new Vec3(dx, movement.y, dz);
+    }
+
+    private boolean isChasing() {
+        return this.getTarget() != null;
+    }
+
+    /**
+     * True when nothing solid is under the inner part of the moved hitbox within {@link #SAFE_DROP} blocks.
+     */
+    private boolean isAboveDrop(double dx, double dz) {
+        AABB box = this.getBoundingBox();
+        double margin = Math.min(EDGE_MARGIN, box.getXsize() / 2.0 - 0.01);
+        AABB below = new AABB(box.minX + dx + margin, box.minY - SAFE_DROP - 1.0E-5, box.minZ + dz + margin,
+                box.maxX + dx - margin, box.minY, box.maxZ + dz - margin);
+        return this.level().noCollision(this, below);
+    }
+
+    private static double stepBack(double value) {
+        return Math.abs(value) <= EDGE_STEP ? 0.0 : value - EDGE_STEP * Math.signum(value);
+    }
+
     /*============*/
     /*   ATTACK   */
     /*============*/
@@ -128,6 +205,8 @@ public class Chimpanzee extends ModAnimal {
     public void handleEntityEvent(byte id) {
         if (id == ATTACK_EVENT) {
             this.attackAnimationTick = ATTACK_ANIMATION_LENGTH;
+        } else if (id == HOOT_EVENT) {
+            this.hootTick = HOOT_LENGTH;
         } else {
             super.handleEntityEvent(id);
         }
@@ -139,15 +218,31 @@ public class Chimpanzee extends ModAnimal {
         if (this.attackAnimationTick > 0) {
             this.attackAnimationTick--;
         }
+        if (this.hootTick > 0) {
+            this.hootTick--;
+        }
     }
 
     public int getAttackAnimationTick() {
         return this.attackAnimationTick;
     }
 
+    public int getHootTick() {
+        return this.hootTick;
+    }
+
     /*============*/
     /*   SOUNDS   */
     /*============*/
+
+    @Override
+    public void playAmbientSound() {
+        super.playAmbientSound();
+        // Clients open the mouth and raise the head while the call plays
+        if (this.level() instanceof ServerLevel level) {
+            level.broadcastEntityEvent(this, HOOT_EVENT);
+        }
+    }
 
     @Override
     protected SoundEvent getAmbientSound() {

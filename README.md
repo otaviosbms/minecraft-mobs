@@ -24,8 +24,9 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 
 ### Chimpanzé (`mobmod:chimpanzee`)
 
-- **Tamanho:** cerca de 1,4 bloco de altura, andando de quatro apoiado nos nós dos dedos. Machos são 15% maiores; fêmeas adultas têm o inchaço vermelho na traseira.
-- **Comportamento:** neutro. Vive em bandos de 3 a 6, escala paredes e árvores como uma aranha, e o bando defende quem for atacado.
+- **Tamanho:** real, cerca de 1 bloco de altura andando de quatro apoiado nos nós dos dedos. Machos são 15% maiores; fêmeas adultas têm o inchaço vermelho na traseira.
+- **Comportamento:** neutro. Vive em bandos de 3 a 6, escala paredes e árvores como uma aranha sem cair sem querer da copa, e o bando defende quem for atacado.
+- **Animações:** caminhada com balanço do corpo, respiração, cabeça curiosa, orelhas que mexem, boca que abre ao chamar e escalada com braços e pernas.
 - **Atributos:** 24 de vida, 4 de dano, velocidade 0.3.
 - **Spawn:** biomas de selva.
 - **Reprodução:** maçã, fatia de melancia, bagas doces, bagas brilhantes e sementes de cacau. Só um macho e uma fêmea geram filhotes.

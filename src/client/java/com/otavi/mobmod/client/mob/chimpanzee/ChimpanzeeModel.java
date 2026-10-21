@@ -14,22 +14,33 @@ import net.minecraft.util.Mth;
 
 /**
  * Chimpanzee walking on its knuckles: long arms, short legs and a body sloping down from the shoulders to the hips.
- * The head has a heavy brow ridge, a pale protruding muzzle and round ears, like the reference.
+ * The head has a heavy brow ridge, a pale protruding snout with a jaw that opens, and round ears, like the reference.
+ * <p>
+ * The geometry is built at twice the usual pixel size and then scaled down to real-life size (about 1 block tall),
+ * so the texture has twice the detail per block, close to the detail level of the elephant.
  * <p>
  * Adult females show a red swelling on the rump. Males are bigger through the scale attribute.
- * Adult and baby share this model: the baby layer is the adult one scaled down by half.
- * UV layout (128x128) is documented in tools/textures/ChimpanzeeTexture.java.
+ * UV layout (256x256) is documented in tools/textures/ChimpanzeeTexture.java.
  */
 public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
-    public static final String MUZZLE = "muzzle";
+    public static final String SNOUT = "snout";
+    public static final String JAW = "jaw";
     public static final String SWELLING = "swelling";
 
-    public static final int TEXTURE_SIZE = 128;
+    public static final int TEXTURE_SIZE = 256;
 
+    /**
+     * Brings the double-detail geometry (46 px tall) down to about 1.05 blocks, the height of a knuckle-walking chimpanzee.
+     */
+    private static final float ADULT_SCALE = 0.37F;
     private static final float BODY_PITCH = -0.35F;
-    private static final MeshTransformer BABY_TRANSFORMER = MeshTransformer.scaling(0.5F);
+    private static final float CLIMBING_BODY_PITCH = -1.0F;
 
+    private final ModelPart body;
     private final ModelPart head;
+    private final ModelPart jaw;
+    private final ModelPart rightEar;
+    private final ModelPart leftEar;
     private final ModelPart swelling;
     private final ModelPart rightArm;
     private final ModelPart leftArm;
@@ -38,88 +49,154 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
 
     public ChimpanzeeModel(ModelPart root) {
         super(root);
+        this.body = root.getChild(PartNames.BODY);
         this.head = root.getChild(PartNames.HEAD);
-        this.swelling = root.getChild(PartNames.BODY).getChild(SWELLING);
+        this.jaw = this.head.getChild(JAW);
+        this.rightEar = this.head.getChild(PartNames.RIGHT_EAR);
+        this.leftEar = this.head.getChild(PartNames.LEFT_EAR);
+        this.swelling = this.body.getChild(SWELLING);
         this.rightArm = root.getChild(PartNames.RIGHT_ARM);
         this.leftArm = root.getChild(PartNames.LEFT_ARM);
         this.rightLeg = root.getChild(PartNames.RIGHT_LEG);
         this.leftLeg = root.getChild(PartNames.LEFT_LEG);
     }
 
-    public static LayerDefinition createAdultLayer() {
+    /**
+     * Double-detail geometry: the ground is at y=24 and every size is twice what it would be at normal detail.
+     */
+    private static MeshDefinition createMesh() {
         MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
         // Body slopes down from the shoulders (front) to the hips (back), like a knuckle-walking ape
         PartDefinition body = root.addOrReplaceChild(PartNames.BODY, CubeListBuilder.create()
-                .texOffs(0, 0).addBox(-6.0F, -5.0F, -7.0F, 12.0F, 10.0F, 14.0F), PartPose.offsetAndRotation(0.0F, 12.0F, 1.0F, BODY_PITCH, 0.0F, 0.0F));
+                .texOffs(0, 0).addBox(-12.0F, -10.0F, -14.0F, 24.0F, 20.0F, 28.0F), PartPose.offsetAndRotation(0.0F, 0.0F, 2.0F, BODY_PITCH, 0.0F, 0.0F));
         body.addOrReplaceChild(SWELLING, CubeListBuilder.create()
-                .texOffs(44, 44).addBox(-5.0F, -3.0F, 0.0F, 10.0F, 6.0F, 3.0F), PartPose.offset(0.0F, -1.0F, 7.0F));
+                .texOffs(0, 140).addBox(-10.0F, -6.0F, 0.0F, 20.0F, 12.0F, 6.0F), PartPose.offset(0.0F, -2.0F, 14.0F));
 
         // Long arms: the chimpanzee leans on its knuckles
-        CubeListBuilder arm = CubeListBuilder.create().texOffs(0, 44).addBox(-2.5F, 0.0F, -2.5F, 5.0F, 15.0F, 5.0F);
-        root.addOrReplaceChild(PartNames.RIGHT_ARM, arm, PartPose.offset(-6.5F, 9.0F, -5.0F));
-        root.addOrReplaceChild(PartNames.LEFT_ARM, arm, PartPose.offset(6.5F, 9.0F, -5.0F));
+        CubeListBuilder arm = CubeListBuilder.create().texOffs(0, 86).addBox(-5.0F, 0.0F, -5.0F, 10.0F, 30.0F, 10.0F);
+        root.addOrReplaceChild(PartNames.RIGHT_ARM, arm, PartPose.offset(-13.0F, -6.0F, -10.0F));
+        root.addOrReplaceChild(PartNames.LEFT_ARM, arm, PartPose.offset(13.0F, -6.0F, -10.0F));
 
         // Short, bent legs under the hips
-        CubeListBuilder leg = CubeListBuilder.create().texOffs(22, 44).addBox(-2.5F, 0.0F, -2.5F, 5.0F, 9.0F, 5.0F);
-        root.addOrReplaceChild(PartNames.RIGHT_LEG, leg, PartPose.offset(-4.5F, 15.0F, 7.0F));
-        root.addOrReplaceChild(PartNames.LEFT_LEG, leg, PartPose.offset(4.5F, 15.0F, 7.0F));
+        CubeListBuilder leg = CubeListBuilder.create().texOffs(44, 86).addBox(-5.0F, 0.0F, -5.0F, 10.0F, 18.0F, 10.0F);
+        root.addOrReplaceChild(PartNames.RIGHT_LEG, leg, PartPose.offset(-9.0F, 6.0F, 14.0F));
+        root.addOrReplaceChild(PartNames.LEFT_LEG, leg, PartPose.offset(9.0F, 6.0F, 14.0F));
 
         // Head on top of the shoulders, with the brow ridge in the same part so it moves with the head
         PartDefinition head = root.addOrReplaceChild(PartNames.HEAD, CubeListBuilder.create()
-                .texOffs(0, 26).addBox(-4.5F, -6.0F, -7.0F, 9.0F, 8.0F, 7.0F)
-                .texOffs(54, 26).addBox(-4.0F, -5.0F, -8.0F, 8.0F, 2.0F, 1.0F), PartPose.offset(0.0F, 7.0F, -5.0F));
-        head.addOrReplaceChild(MUZZLE, CubeListBuilder.create()
-                .texOffs(34, 26).addBox(-3.0F, 0.0F, -3.0F, 6.0F, 4.0F, 3.0F), PartPose.offset(0.0F, -2.0F, -7.0F));
+                .texOffs(0, 52).addBox(-9.0F, -12.0F, -14.0F, 18.0F, 16.0F, 14.0F)
+                .texOffs(68, 52).addBox(-8.0F, -10.0F, -16.0F, 16.0F, 4.0F, 2.0F), PartPose.offset(0.0F, -10.0F, -10.0F));
+        // Snout and a jaw hinged at its back, so the mouth can open
+        head.addOrReplaceChild(SNOUT, CubeListBuilder.create()
+                .texOffs(68, 60).addBox(-6.0F, 0.0F, -6.0F, 12.0F, 5.0F, 6.0F), PartPose.offset(0.0F, -4.0F, -14.0F));
+        head.addOrReplaceChild(JAW, CubeListBuilder.create()
+                .texOffs(68, 74).addBox(-6.0F, 0.0F, -6.0F, 12.0F, 3.0F, 6.0F), PartPose.offset(0.0F, 1.0F, -14.0F));
         head.addOrReplaceChild(PartNames.RIGHT_EAR, CubeListBuilder.create()
-                .texOffs(74, 26).addBox(-1.0F, -2.0F, -2.0F, 1.0F, 4.0F, 4.0F), PartPose.offset(-4.5F, -3.0F, -3.0F));
+                .texOffs(108, 52).addBox(-2.0F, -4.0F, -4.0F, 2.0F, 8.0F, 8.0F), PartPose.offset(-9.0F, -6.0F, -6.0F));
         head.addOrReplaceChild(PartNames.LEFT_EAR, CubeListBuilder.create()
-                .texOffs(74, 26).mirror().addBox(0.0F, -2.0F, -2.0F, 1.0F, 4.0F, 4.0F), PartPose.offset(4.5F, -3.0F, -3.0F));
+                .texOffs(108, 52).mirror().addBox(0.0F, -4.0F, -4.0F, 2.0F, 8.0F, 8.0F), PartPose.offset(9.0F, -6.0F, -6.0F));
 
-        return LayerDefinition.create(mesh, TEXTURE_SIZE, TEXTURE_SIZE);
+        return mesh;
+    }
+
+    public static LayerDefinition createAdultLayer() {
+        return LayerDefinition.create(createMesh(), TEXTURE_SIZE, TEXTURE_SIZE).apply(MeshTransformer.scaling(ADULT_SCALE));
     }
 
     public static LayerDefinition createBabyLayer() {
-        return createAdultLayer().apply(BABY_TRANSFORMER);
+        return LayerDefinition.create(createMesh(), TEXTURE_SIZE, TEXTURE_SIZE).apply(MeshTransformer.scaling(ADULT_SCALE * 0.5F));
     }
 
     @Override
     public void setupAnim(ChimpanzeeRenderState state) {
-        // Resets every part to its default pose: rotations below are relative to it
+        // Resets every part to its default pose: rotations and offsets below are relative to it
         super.setupAnim(state);
 
         // Only adult females show the swelling
         this.swelling.visible = state.sex == Sex.FEMALE && !state.isBaby;
 
         float age = state.ageInTicks;
+        float pos = state.walkAnimationPos;
+        float speed = Math.min(state.walkAnimationSpeed, 1.0F);
+        float still = 1.0F - speed;
+        // Offsets are in double-detail pixels: the part scale brings them to the size of this layer (adult or baby)
+        float px = this.body.yScale;
 
-        // Head follows where the chimpanzee looks, with a small idle bob
-        this.head.xRot = state.xRot * Mth.DEG_TO_RAD + Mth.sin(age * 0.1F) * 0.03F;
+        // Head follows where the chimpanzee looks
+        this.head.xRot = state.xRot * Mth.DEG_TO_RAD;
         this.head.yRot = Mth.clamp(state.yRot, -60.0F, 60.0F) * Mth.DEG_TO_RAD;
 
-        // Knuckle-walking: diagonal limbs move together, arms swing wider than the short legs
-        float pos = state.walkAnimationPos;
-        float speed = state.walkAnimationSpeed;
+        if (state.climbing) {
+            this.animateClimbing(age);
+        } else {
+            this.animateWalking(pos, speed, px);
+        }
+
+        // Idle: breathing, a curious head tilt and ears twitching now and then
+        float breath = Mth.sin(age * 0.08F) * 0.6F * px * still;
+        this.body.y += breath;
+        this.head.y += breath * 0.5F;
+        this.head.zRot = Mth.sin(age * 0.03F) * 0.1F * still;
+        this.rightEar.zRot = -twitch(age * 0.17F) * 0.35F;
+        this.leftEar.zRot = twitch(age * 0.13F + 2.0F) * 0.35F;
+
+        // Hoot: raise the head and open the mouth while calling
+        if (state.hootProgress > 0.0F) {
+            float call = Mth.sin(state.hootProgress * Mth.PI);
+            this.jaw.xRot = call * 0.7F;
+            this.head.xRot -= call * 0.5F;
+        }
+
+        // Attack: rear up and swing both arms down onto the target, mouth open
+        if (state.attackProgress > 0.0F) {
+            float lift = Mth.sin(state.attackProgress * Mth.PI);
+            this.rightArm.xRot -= lift * 2.0F;
+            this.leftArm.xRot -= lift * 2.0F;
+            this.head.xRot -= lift * 0.4F;
+            this.jaw.xRot = Math.max(this.jaw.xRot, lift * 0.5F);
+        }
+    }
+
+    /**
+     * Knuckle-walking: diagonal limbs move together, the body bobs and rolls with each step and the head counters it.
+     */
+    private void animateWalking(float pos, float speed, float px) {
         float swing = Mth.cos(pos * 0.8F) * speed;
         this.rightArm.xRot = swing * 0.9F;
         this.leftLeg.xRot = swing * 0.7F;
         this.leftArm.xRot = -swing * 0.9F;
         this.rightLeg.xRot = -swing * 0.7F;
 
-        // Climbing: both arms reach up the wall
-        if (state.climbing) {
-            float reach = Mth.sin(age * 0.4F) * 0.3F;
-            this.rightArm.xRot = -2.2F + reach;
-            this.leftArm.xRot = -2.2F - reach;
-        }
+        // Two bobs per stride: the body rises when a pair of limbs passes under it
+        float bob = Math.abs(Mth.sin(pos * 0.8F)) * speed * px;
+        this.body.y -= bob * 2.0F;
+        this.head.y -= bob * 1.4F;
+        this.body.zRot = Mth.sin(pos * 0.8F) * 0.06F * speed;
+        this.head.xRot += Mth.sin(pos * 1.6F) * 0.05F * speed;
+    }
 
-        // Attack: rear up and swing both arms down onto the target
-        if (state.attackProgress > 0.0F) {
-            float lift = Mth.sin(state.attackProgress * Mth.PI);
-            this.rightArm.xRot -= lift * 2.0F;
-            this.leftArm.xRot -= lift * 2.0F;
-            this.head.xRot -= lift * 0.4F;
-        }
+    /**
+     * Climbing: the body turns upright against the wall, arms reach up in turn while the opposite leg pushes.
+     */
+    private void animateClimbing(float age) {
+        float cycle = Mth.sin(age * 0.4F);
+        this.body.xRot = CLIMBING_BODY_PITCH;
+        this.rightArm.xRot = -2.4F + cycle * 0.35F;
+        this.leftArm.xRot = -2.4F - cycle * 0.35F;
+        this.rightLeg.xRot = -0.9F - cycle * 0.5F;
+        this.leftLeg.xRot = -0.9F + cycle * 0.5F;
+        this.rightArm.zRot = 0.15F;
+        this.leftArm.zRot = -0.15F;
+        // Looks up the wall
+        this.head.xRot -= 0.6F;
+    }
+
+    /**
+     * Short spikes now and then: 0 most of the time, briefly up to 1.
+     */
+    private static float twitch(float phase) {
+        return (float) Math.pow(Math.max(0.0F, Mth.sin(phase)), 12.0);
     }
 }

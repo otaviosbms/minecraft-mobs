@@ -12,7 +12,7 @@
 
 ![Variantes do chimpanzé](../imagens/chimpanze-variantes.png)
 
-Um primata neutro das selvas. Vive em bandos, anda apoiado nos nós dos dedos e escala paredes e troncos como uma aranha. Quando um membro do bando é atacado, os outros defendem.
+Um primata neutro das selvas, em tamanho real (cerca de 1 bloco de altura andando de quatro). Vive em bandos, anda apoiado nos nós dos dedos e escala paredes e troncos como uma aranha, sem cair sem querer da copa das árvores. Quando um membro do bando é atacado, os outros defendem.
 
 ## Arquivos
 
@@ -44,12 +44,12 @@ Os demais atributos vêm de `Animal.createAnimalAttributes()`, com os valores pa
 
 | | Largura × altura (blocos) | Altura dos olhos |
 |---|---|---|
-| Fêmea adulta | 1.0 × 1.4 | 1.15 |
-| Macho adulto | 1.15 × 1.61 | 1.32 |
-| Filhote fêmea | 0.5 × 0.7 | 0.58 |
-| Filhote macho | 0.58 × 0.81 | 0.66 |
+| Fêmea adulta | 0.8 × 1.05 | 0.9 |
+| Macho adulto | 0.92 × 1.21 | 1.04 |
+| Filhote fêmea | 0.4 × 0.53 | 0.45 |
+| Filhote macho | 0.46 × 0.6 | 0.52 |
 
-A altura é a do animal andando de quatro, apoiado nos nós dos dedos. A distância de rastreamento do cliente é de 8 chunks.
+Escala da vida real: um chimpanzé andando de quatro tem cerca de 1 m até o topo da cabeça (1,2 a 1,7 m em pé). A distância de rastreamento do cliente é de 8 chunks.
 
 ## Comportamento e IA
 
@@ -86,6 +86,19 @@ Igual à da aranha:
 - o estado de escalada é sincronizado com o cliente, que anima os braços estendidos para cima.
 
 Na selva, isso deixa o chimpanzé subir nas árvores e nos troncos grossos.
+
+### Segurança contra quedas
+
+Para não pular da copa das árvores sem querer:
+
+| Regra | Como funciona |
+|---|---|
+| Borda | Ao andar sozinho (passeando, seguindo comida ou os pais, fugindo), o movimento que o levaria para fora de uma borda com queda **maior que 2 blocos** é cortado, como um jogador agachado (`maybeBackOffFromEdge`). Pelo menos 0,15 bloco da área interna da hitbox precisa continuar sobre chão |
+| Caminhos | A navegação só planeja quedas de até 2 blocos (`getMaxFallDistance`), então os caminhos combinam com a regra da borda e ele não fica preso tentando segui-los |
+| Exceção | Perseguindo um alvo (depois de ser provocado), pode pular de qualquer altura, como um animal vanilla |
+| Já pendurado | Se for empurrado ou levar knockback para fora da borda, a regra não o trava: ele pode voltar ou cair |
+
+O limite está em `Chimpanzee.SAFE_DROP`. Na copa, ele desce por degraus de até 2 blocos ou escalando os troncos.
 
 ### Ataque
 
@@ -150,20 +163,32 @@ Emprestados do panda, com o tom da voz em **1.35×** (mais agudo, mais perto de 
 
 ## Modelo
 
-Feito em código Java, sem Blockbench nem GeckoLib. Textura de 128×128. Medidas em pixels do modelo (16 px = 1 bloco), para a fêmea adulta:
+Feito em código Java, sem Blockbench nem GeckoLib. Textura de 256×256.
+
+O modelo é construído em **detalhe dobrado** (cada peça com o dobro de pixels) e depois reduzido para o tamanho real com `MeshTransformer.scaling(0.37F)` (filhote: `0.185F`). Assim a textura tem o dobro de pixels por bloco, com um nível de detalhe próximo ao do elefante. Medidas em pixels da geometria em detalhe dobrado:
 
 | Parte | Tamanho (L × A × C) | Observação |
 |---|---|---|
-| Corpo | 12 × 10 × 14 | Inclinado: ombros altos, quadril baixo (`xRot -0.35`) |
-| Cabeça | 9 × 8 × 7 | Sobre os ombros |
-| Arco da sobrancelha | 8 × 2 × 1 | Parte da cabeça, saliente na testa |
-| Focinho | 6 × 4 × 3 | Claro, com narinas e boca |
-| Orelhas (2) | 1 × 4 × 4 | Redondas, nas laterais da cabeça, com dobra escura |
-| Braços (2) | 5 × 15 × 5 | Longos, com mãos claras (apoio nos nós dos dedos) |
-| Pernas (2) | 5 × 9 × 5 | Curtas, com pés claros |
-| Inchaço | 10 × 6 × 3 | Vermelho, na traseira. Só fêmeas adultas |
+| Corpo | 24 × 20 × 28 | Inclinado: ombros altos, quadril baixo (`xRot -0.35`) |
+| Cabeça | 18 × 16 × 14 | Sobre os ombros |
+| Arco da sobrancelha | 16 × 4 × 2 | Parte da cabeça, saliente na testa |
+| Focinho | 12 × 5 × 6 | Claro, com narinas, rugas e lábio superior |
+| Mandíbula | 12 × 3 × 6 | Articulada atrás do focinho: abre mostrando dentes e língua |
+| Orelhas (2) | 2 × 8 × 8 | Redondas, nas laterais da cabeça, com dobra escura |
+| Braços (2) | 10 × 30 × 10 | Longos, com mãos claras, dedos e unhas (apoio nos nós dos dedos) |
+| Pernas (2) | 10 × 18 × 10 | Curtas, com pés claros e artelhos |
+| Inchaço | 20 × 12 × 6 | Vermelho, na traseira. Só fêmeas adultas |
 
-O filhote é o mesmo modelo reduzido à metade (`MeshTransformer.scaling(0.5F)`). O layout UV de cada peça está documentado no topo de `tools/textures/ChimpanzeeTexture.java`.
+O layout UV de cada peça está documentado no topo de `tools/textures/ChimpanzeeTexture.java`.
+
+### Textura
+
+Gerada no mesmo estilo do elefante (`MobTexture`), com detalhes pintados na resolução dobrada:
+- pelo com fios curtos (verticais nas laterais, deitados nas costas), reflexo acinzentado nos ombros e faixa escura na espinha;
+- rosto claro com bico de viúva, olheiras fundas, olhos com íris, pupila, brilho e pálpebra;
+- narinas largas, sulco até o lábio, lábios rosados, dentes e língua (visíveis com a boca aberta);
+- mãos e pés com nós dos dedos, dedos separados, unhas e palmas com vincos;
+- orelhas com dobra em "C" e inchaço com dobras e brilho.
 
 ## Animações
 
@@ -171,10 +196,16 @@ Todas procedurais, calculadas em `ChimpanzeeModel.setupAnim`:
 
 | Animação | Como funciona |
 |---|---|
-| Cabeça | Acompanha o olhar, até 60° para os lados, com um leve balanço parado |
-| Caminhada | Membros diagonais juntos; os braços balançam mais que as pernas curtas |
-| Escalada | Os dois braços esticados para cima, alternando como se agarrasse a parede |
-| Ataque | Levanta os dois braços e bate para baixo, com a cabeça para trás (0,5 s) |
+| Cabeça | Acompanha o olhar, até 60° para os lados |
+| Caminhada | Membros diagonais juntos (os braços balançam mais que as pernas). O corpo sobe e desce duas vezes por passada e balança de lado; a cabeça compensa o movimento |
+| Respiração (parado) | O corpo e a cabeça sobem e descem devagar |
+| Cabeça curiosa (parado) | Inclina a cabeça de um lado para o outro |
+| Orelhas | Mexem rapidamente de vez em quando, cada uma no seu ritmo |
+| Chamado | Toda vez que toca o som ambiente, levanta a cabeça e abre a boca (1 s). O servidor avisa o cliente pelo evento de entidade `5` |
+| Escalada | O corpo fica mais vertical contra a parede, os braços se alternam esticados para cima, cada perna empurra junto com o braço oposto, e a cabeça olha para cima |
+| Ataque | Levanta os dois braços e bate para baixo, com a cabeça para trás e a boca aberta (0,5 s) |
+
+Os deslocamentos (respiração e passos) são multiplicados pela escala da camada, para o filhote balançar na mesma proporção do adulto.
 
 ## Itens e creative
 
@@ -212,3 +243,5 @@ Coberto pelos gametests genéricos (`./gradlew runGameTestServer`), que percorre
 - dois pais albinos nunca têm filhote normal.
 
 O teste de loot table não se aplica, porque o chimpanzé não tem drops.
+
+Teste específico, `chimpanzeeDoesNotWalkOffHighLedges`: põe o chimpanzé sobre um bloco a 5 de altura, tenta movê-lo 2 blocos para fora e confirma que ele continua lá em cima.

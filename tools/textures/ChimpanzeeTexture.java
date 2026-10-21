@@ -7,19 +7,23 @@ import java.util.Map;
  * Paints the chimpanzee textures (normal, albino, melanistic) and its spawn egg on the UV layout of ChimpanzeeModel,
  * in the same art style as the elephant (see {@link MobTexture}).
  * <p>
+ * The model is built at double detail (then scaled down), so every face has twice the pixels of a normal model:
+ * fur strands, eyes, lips, teeth, fingers and toes are painted at that resolution.
+ * <p>
  * Run from the project root with the project JDK:
  * <pre>java tools/textures/ChimpanzeeTexture.java src/client/resources/assets/mobmod/textures</pre>
  *
- * <h2>UV layout (128x128)</h2>
+ * <h2>UV layout (256x256)</h2>
  * <pre>
- * body       12x10x14  at (0, 0)
- * head        9x8x7    at (0, 26)
- * muzzle      6x4x3    at (34, 26)
- * brow ridge  8x2x1    at (54, 26)
- * ear         1x4x4    at (74, 26)   mirrored for the left ear
- * arm         5x15x5   at (0, 44)    shared by both arms
- * leg         5x9x5    at (22, 44)   shared by both legs
- * swelling   10x6x3    at (44, 44)   adult females only
+ * body       24x20x28  at (0, 0)
+ * head       18x16x14  at (0, 52)
+ * brow ridge 16x4x2    at (68, 52)
+ * snout      12x5x6    at (68, 60)
+ * jaw        12x3x6    at (68, 74)
+ * ear         2x8x8    at (108, 52)  mirrored for the left ear
+ * arm        10x30x10  at (0, 86)    shared by both arms
+ * leg        10x18x10  at (44, 86)   shared by both legs
+ * swelling   20x12x6   at (0, 140)   adult females only
  * </pre>
  */
 public class ChimpanzeeTexture extends MobTexture {
@@ -27,12 +31,16 @@ public class ChimpanzeeTexture extends MobTexture {
     private static final int SKIN = 2;
     private static final int EYE = 3;
     private static final int PUPIL = 4;
-    private static final int MOUTH = 5;
-    private static final int EAR_INNER = 6;
-    private static final int SWELLING = 7;
+    private static final int EYE_SHINE = 5;
+    private static final int LIP = 6;
+    private static final int MOUTH = 7;
+    private static final int TEETH = 8;
+    private static final int EAR_INNER = 9;
+    private static final int NAIL = 10;
+    private static final int SWELLING = 11;
 
     public ChimpanzeeTexture() {
-        super(128);
+        super(256);
     }
 
     public static void main(String[] args) throws IOException {
@@ -49,136 +57,222 @@ public class ChimpanzeeTexture extends MobTexture {
     @Override
     protected List<Palette> palettes() {
         return List.of(
-                // Near-black brown fur, pale pinkish face, hands and feet, brown eyes
-                palette("", new Ramp(0x141110, 0x2b2421, 0x4b403a), new Ramp(0xa88c80, 0xd2b6a8, 0xe9d6cb),
-                        0x7a3f1c, 0x1a0e08, 0x7a4a44, new Ramp(0x5e4640, 0x7d625a, 0x977b72), new Ramp(0x8f3328, 0xb84a3c, 0xd4675a)),
+                // Near-black brown fur with a grey sheen, pale pinkish face, hands and feet, brown eyes
+                palette("", new Ramp(0x100d0c, 0x2b2421, 0x5a4c45), new Ramp(0x9c8073, 0xd2b6a8, 0xecdbd0),
+                        0x7a3f1c, 0x140a05, 0xd8cfc8, new Ramp(0x6e3f3a, 0x9a5f58, 0xb67a72), 0x3a1714, 0xe8e0cc,
+                        new Ramp(0x4e3933, 0x7d625a, 0x9a7f76), 0x8c7a70, new Ramp(0x8a2f25, 0xb84a3c, 0xdb6d5f)),
                 // White fur, pink skin and red eyes
-                palette("_albino", new Ramp(0xcfc6b8, 0xe6dfd3, 0xf7f3ec), new Ramp(0xd9a9a0, 0xefc6bd, 0xf8dcd6),
-                        0xc03a46, 0x7a1620, 0xb06a66, new Ramp(0xc8958c, 0xdba59c, 0xe8b9b0), new Ramp(0xc25a52, 0xde7a70, 0xef9a90)),
+                palette("_albino", new Ramp(0xc9bfb0, 0xe6dfd3, 0xfbf8f2), new Ramp(0xd29d94, 0xefc6bd, 0xfae2dc),
+                        0xc03a46, 0x6e1019, 0xfff2f2, new Ramp(0xc06a68, 0xdc8a86, 0xeca6a0), 0x8a3a40, 0xf4efe2,
+                        new Ramp(0xc08a82, 0xdba59c, 0xecbdb4), 0xe8d6cc, new Ramp(0xbd554d, 0xde7a70, 0xf29d93)),
                 // Jet-black fur and dark skin
-                palette("_melanistic", new Ramp(0x060505, 0x0f0c0b, 0x231d1b), new Ramp(0x3a2d29, 0x54423d, 0x6d5852),
-                        0x3d200f, 0x050302, 0x2a1a17, new Ramp(0x241b18, 0x332723, 0x44352f), new Ramp(0x5a1f1a, 0x7a2c25, 0x95433a))
+                palette("_melanistic", new Ramp(0x030202, 0x0f0c0b, 0x2c2421), new Ramp(0x2c211e, 0x54423d, 0x765f58),
+                        0x3d200f, 0x020101, 0x9a9087, new Ramp(0x1e1210, 0x2f1d1a, 0x452c27), 0x120807, 0xcfc6b2,
+                        new Ramp(0x1a1210, 0x2b201d, 0x3f302b), 0x4a3d37, new Ramp(0x4e1914, 0x7a2c25, 0x9a453b))
         );
     }
 
-    private static Palette palette(String suffix, Ramp fur, Ramp skin, int eye, int pupil, int mouth, Ramp earInner, Ramp swelling) {
-        return new Palette(suffix, Map.of(
-                FUR, fur,
-                SKIN, skin,
-                EYE, Ramp.flat(eye),
-                PUPIL, Ramp.flat(pupil),
-                MOUTH, Ramp.flat(mouth),
-                EAR_INNER, earInner,
-                SWELLING, swelling
+    private static Palette palette(String suffix, Ramp fur, Ramp skin, int eye, int pupil, int eyeShine, Ramp lip, int mouth,
+                                   int teeth, Ramp earInner, int nail, Ramp swelling) {
+        return new Palette(suffix, Map.ofEntries(
+                Map.entry(FUR, fur),
+                Map.entry(SKIN, skin),
+                Map.entry(EYE, Ramp.flat(eye)),
+                Map.entry(PUPIL, Ramp.flat(pupil)),
+                Map.entry(EYE_SHINE, Ramp.flat(eyeShine)),
+                Map.entry(LIP, lip),
+                Map.entry(MOUTH, Ramp.around(mouth, 0.2)),
+                Map.entry(TEETH, Ramp.around(teeth, 0.15)),
+                Map.entry(EAR_INNER, earInner),
+                Map.entry(NAIL, Ramp.flat(nail)),
+                Map.entry(SWELLING, swelling)
         ));
     }
 
     @Override
     protected void paint() {
-        this.body(0, 0, 12, 10, 14);
-        this.head(0, 26, 9, 8, 7);
-        this.muzzle(34, 26, 6, 4, 3);
-        this.brow(54, 26, 8, 2, 1);
-        this.ear(74, 26, 1, 4, 4);
-        this.limb(0, 44, 5, 15, 5, 3, 101);
-        this.limb(22, 44, 5, 9, 5, 2, 113);
-        this.swelling(44, 44, 10, 6, 3);
+        this.body(0, 0, 24, 20, 28);
+        this.head(0, 52, 18, 16, 14);
+        this.brow(68, 52, 16, 4, 2);
+        this.snout(68, 60, 12, 5, 6);
+        this.jaw(68, 74, 12, 3, 6);
+        this.ear(108, 52, 2, 8, 8);
+        this.limb(0, 86, 10, 30, 10, 8, 101);
+        this.limb(44, 86, 10, 18, 10, 5, 113);
+        this.swelling(0, 140, 20, 12, 6);
     }
 
+    /*=========*/
+    /*   FUR   */
+    /*=========*/
+
     /**
-     * Fur: same noise as the elephant hide, with more grain and light streaks for the hair.
+     * Fur: the shared hide noise plus short hair strands falling down the sides and lying along the back.
      */
     private void furBox(int u, int v, int w, int h, int d, int seed) {
         this.shadedBox(u, v, w, h, d, FUR, seed);
-        this.forEachBoxPixel(u, v, w, h, d, (x, y) -> this.shade[x][y] += (noise(x, y, seed + 7) - 0.5) * 0.35);
-        this.streaks(u, v, w, h, d, 1.3, 0.4, 0.2, seed + 3);
+        this.forEachBoxPixel(u, v, w, h, d, (x, y) -> {
+            boolean topRow = y < v + d;
+            // Strands are 3 px long: vertical on the side faces, horizontal on the top and bottom faces
+            double strand = topRow ? noise(x / 3, y, seed + 5) : noise(x, y / 3, seed + 5);
+            if (strand > 0.86) {
+                this.shade[x][y] += 0.35;
+            } else if (strand < 0.1) {
+                this.shade[x][y] -= 0.3;
+            }
+        });
     }
 
     private void body(int u, int v, int w, int h, int d) {
         this.furBox(u, v, w, h, d, 11);
-        // Greyer, thinner fur on the belly
-        this.fillShade(u + d + w, v, w, d, 0.2);
+        // Grey sheen on the shoulders and back, like the reference
+        this.fillShade(u + d, v, w, d / 2, 0.18);
+        // Thinner, greyer fur on the belly and chest
+        this.fillShade(u + d + w, v, w, d, 0.3);
+        // Darker band along the spine
+        this.fillShade(u + d + w / 2 - 1, v, 2, d, -0.2);
     }
+
+    /*==========*/
+    /*   HEAD   */
+    /*==========*/
 
     private void head(int u, int v, int w, int h, int d) {
         this.furBox(u, v, w, h, d, 31);
-        int frontX = u + d;
-        int frontY = v + d;
-        // Pale face under the brow ridge, framed by fur on the sides and top
-        this.repaint(frontX + 1, frontY + 2, w - 2, h - 2, SKIN);
-        this.repaint(frontX + 2, frontY + 1, w - 4, 1, SKIN);
-        // Wrinkles under the eyes
-        this.fillShade(frontX + 1, frontY + 4, w - 2, 1, -0.3);
-        // Eyes: brown iris with a dark pupil, deep under the brow
-        this.paintEye(frontX + 1, frontY + 3);
-        this.paintEye(frontX + w - 3, frontY + 3);
+        int fx = u + d;
+        int fy = v + d;
+        // Pale face from the eyes down, framed by fur on the sides and a widow's peak on top
+        this.repaint(fx + 2, fy + 4, w - 4, h - 4, SKIN);
+        this.repaint(fx + 4, fy + 2, w - 8, 2, SKIN);
+        this.repaint(fx + w / 2 - 1, fy + 2, 2, 1, FUR);
+        // Sunken eye sockets under the brow ridge
+        this.fillShade(fx + 2, fy + 5, 6, 3, -0.3);
+        this.fillShade(fx + w - 8, fy + 5, 6, 3, -0.3);
+        this.paintEye(fx + 3, fy + 6, false);
+        this.paintEye(fx + w - 7, fy + 6, true);
+        // Cheek wrinkles beside the snout
+        this.fillShade(fx + 2, fy + 10, 1, 4, -0.3);
+        this.fillShade(fx + w - 3, fy + 10, 1, 4, -0.3);
+        // Ears sit on fur: a lighter patch where the skin shows through on the sides
+        this.fillShade(u + 4, fy + 4, 6, 6, 0.1);
+        this.fillShade(u + d + w + 4, fy + 4, 6, 6, 0.1);
     }
 
-    private void paintEye(int x, int y) {
-        this.fill(x, y, 2, 1, EYE);
-        this.material[x + 1][y] = PUPIL;
-        // Shadow of the brow ridge right above the eye
-        this.fillShade(x - 1, y - 1, 4, 1, -0.45);
-    }
-
-    private void muzzle(int u, int v, int w, int h, int d) {
-        this.shadedBox(u, v, w, h, d, SKIN, 41);
-        int frontX = u + d;
-        int frontY = v + d;
-        // Nostrils, a wide mouth line and a lighter lower lip
-        this.fill(frontX + 2, frontY, 1, 1, MOUTH);
-        this.fill(frontX + w - 3, frontY, 1, 1, MOUTH);
-        this.fill(frontX, frontY + 2, w, 1, MOUTH);
-        this.fillShade(frontX, frontY + 3, w, 1, 0.25);
-        // Wrinkles along the snout
-        this.spiral(frontX, frontY, w, h, 0.12);
+    /**
+     * Brown iris, dark pupil looking forward and a small shine, with a heavy upper eyelid.
+     */
+    private void paintEye(int x, int y, boolean mirrored) {
+        this.fill(x, y, 4, 2, EYE);
+        this.fill(mirrored ? x + 1 : x + 2, y, 1, 2, PUPIL);
+        this.material[mirrored ? x + 2 : x + 1][y] = EYE_SHINE;
+        // Upper eyelid and the skin fold under the eye
+        this.fillShade(x - 1, y - 1, 6, 1, -0.45);
+        this.fillShade(x, y + 2, 4, 1, -0.2);
     }
 
     private void brow(int u, int v, int w, int h, int d) {
         this.shadedBox(u, v, w, h, d, SKIN, 53);
-        // Heavy ridge: light on top, dark underneath
-        this.forEachBoxPixel(u, v, w, h, d, (x, y) -> {
-            if (y == v + d + h - 1) {
-                this.shade[x][y] -= 0.35;
-            }
-        });
+        int fx = u + d;
+        int fy = v + d;
+        // Heavy ridge: wrinkled skin, light on top, dark shadow underneath
+        this.fillShade(fx, fy, w, 1, 0.15);
+        this.fillShade(fx + 1, fy + 1, w - 2, 1, -0.2);
+        this.fillShade(fx, fy + h - 1, w, 1, -0.4);
+        // Slight dip in the middle of the ridge
+        this.fillShade(fx + w / 2 - 1, fy, 2, h, -0.15);
+    }
+
+    private void snout(int u, int v, int w, int h, int d) {
+        this.shadedBox(u, v, w, h, d, SKIN, 41);
+        int fx = u + d;
+        int fy = v + d;
+        // Wide nostrils, a groove down to the upper lip and wrinkles across the snout
+        this.fill(fx + 3, fy + 1, 2, 1, PUPIL);
+        this.fill(fx + w - 5, fy + 1, 2, 1, PUPIL);
+        this.fillShade(fx + w / 2 - 1, fy + 2, 2, 2, -0.25);
+        this.repaint(fx, fy + h - 1, w, 1, LIP);
+        for (int row = v + 1; row < v + d; row += 2) {
+            this.fillShade(u + d + 1, row, w - 2, 1, -0.25);
+        }
+        // Roof of the mouth with the upper teeth along the front edge (the last row of the face), seen when the jaw opens
+        int bx = u + d + w;
+        int front = v + d - 1;
+        this.repaint(bx, v, w, d, MOUTH);
+        this.repaint(bx + 1, front, w - 2, 1, TEETH);
+        this.fillShade(bx + 1, front, 1, 1, -0.4);
+        this.fillShade(bx + w - 2, front, 1, 1, -0.4);
+    }
+
+    private void jaw(int u, int v, int w, int h, int d) {
+        this.shadedBox(u, v, w, h, d, SKIN, 47);
+        int fx = u + d;
+        int fy = v + d;
+        // Lower lip, pale chin underneath
+        this.repaint(fx, fy, w, 1, LIP);
+        this.fillShade(fx + 2, fy + h - 1, w - 4, 1, 0.2);
+        // Inside of the mouth with the lower teeth along the front edge (the last row of the face) and the tongue behind
+        int tx = u + d;
+        this.repaint(tx, v, w, d, MOUTH);
+        this.repaint(tx + 1, v + d - 1, w - 2, 1, TEETH);
+        this.repaint(tx + 3, v + 1, w - 6, d - 3, LIP);
     }
 
     private void ear(int u, int v, int w, int h, int d) {
         this.shadedBox(u, v, w, h, d, SKIN, 61);
-        // Both big faces: skin rim with a dark "C" fold inside, like the reference
+        // Both big faces (d x h): skin rim with a dark "C" fold inside and a lighter center, like the reference
         for (int faceX : new int[]{u, u + d + w}) {
             int faceY = v + d;
             this.repaint(faceX + 1, faceY + 1, d - 2, h - 2, EAR_INNER);
-            this.shade[faceX + 2][faceY + 2] += 0.4;
-            this.shade[faceX + 1][faceY + 1] -= 0.2;
+            this.repaint(faceX + 3, faceY + 3, d - 5, h - 5, SKIN);
+            this.fillShade(faceX + 3, faceY + 3, d - 5, h - 5, -0.1);
+            this.fillShade(faceX + 1, faceY + 1, d - 2, 1, -0.25);
         }
     }
 
+    /*===========*/
+    /*   LIMBS   */
+    /*===========*/
+
     /**
-     * Arm or leg: fur that gets lighter towards the bottom, then pale hands or feet.
+     * Arm or leg: fur that gets greyer towards the bottom, then pale hands or feet with fingers or toes.
      */
     private void limb(int u, int v, int w, int h, int d, int skinRows, int seed) {
         this.furBox(u, v, w, h, d, seed);
         this.sideFaces(u, v, w, h, d, (fx, fy, fw, fh) -> {
-            // Greyer fur on the forearm/shin
-            this.fillShade(fx, fy + fh - skinRows - 3, fw, 3, 0.25);
-            this.repaint(fx, fy + fh - skinRows, fw, skinRows, SKIN);
-            // Knuckles and toes
-            this.fillShade(fx, fy + fh - skinRows, fw, 1, -0.25);
-            for (int x = fx + 1; x < fx + fw; x += 2) {
-                this.shade[x][fy + fh - 1] -= 0.3;
+            int skinTop = fy + fh - skinRows;
+            // Greyer, shaggier fur on the forearm/shin, ending in a ragged line over the skin
+            this.fillShade(fx, skinTop - 5, fw, 5, 0.25);
+            this.repaint(fx, skinTop, fw, skinRows, SKIN);
+            for (int x = fx; x < fx + fw; x += 2) {
+                this.repaint(x, skinTop, 1, 1, FUR);
+            }
+            // Knuckles (a wrinkled band) and fingers/toes separated by dark lines, nails at the tips
+            this.fillShade(fx, skinTop + 2, fw, 1, -0.3);
+            for (int x = fx + 2; x < fx + fw - 1; x += 3) {
+                this.fillShade(x, fy + fh - 3, 1, 3, -0.4);
+            }
+            for (int x = fx; x < fx + fw; x += 3) {
+                this.repaint(x + 1, fy + fh - 1, 1, 1, NAIL);
             }
         });
-        // Palm or sole
-        this.repaint(u + d + w, v, w, d, SKIN);
-        this.fillShade(u + d + w, v, w, d, -0.2);
+        // Palm or sole: skin with creases
+        int sx = u + d + w;
+        this.repaint(sx, v, w, d, SKIN);
+        this.fillShade(sx, v, w, d, -0.15);
+        this.fillShade(sx + 1, v + d / 2, w - 2, 1, -0.3);
+        this.fillShade(sx + w / 2, v + 1, 1, d - 2, -0.2);
     }
 
     private void swelling(int u, int v, int w, int h, int d) {
         this.shadedBox(u, v, w, h, d, SWELLING, 71);
-        // Smooth and swollen: lighter in the middle, darker folds
-        this.sideFaces(u, v, w, h, d, (fx, fy, fw, fh) -> this.spiral(fx, fy, fw, fh, 0.15));
-        this.fillShade(u + d + w + d + 1, v + d + 1, w - 2, h - 2, 0.2);
+        // Swollen and glossy: folds across, a lighter highlight on the back face
+        this.forEachBoxPixel(u, v, w, h, d, (x, y) -> {
+            if (y >= v + d && (y - v - d) % 4 == 3) {
+                this.shade[x][y] -= 0.3;
+            }
+        });
+        int backX = u + 2 * d + w;
+        this.fillShade(backX + 3, v + d + 2, w - 6, 3, 0.3);
+        this.spiral(backX, v + d, w, h, 0.12);
     }
 }

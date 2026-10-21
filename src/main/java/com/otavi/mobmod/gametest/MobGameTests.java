@@ -7,7 +7,11 @@ import com.otavi.mobmod.entity.genetics.SkinVariant;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
+import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.ArrayList;
@@ -92,6 +96,24 @@ public class MobGameTests {
             }
         }
         helper.succeed();
+    }
+
+    @GameTest(maxTicks = 100)
+    public void chimpanzeeDoesNotWalkOffHighLedges(GameTestHelper helper) {
+        // A single block 5 high: walking off it would be a fall far higher than Chimpanzee.SAFE_DROP
+        var platform = new BlockPos(3, 5, 3);
+        helper.setBlock(platform, Blocks.STONE);
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, platform.above());
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(chimpanzee.onGround(), "chimpanzee should be standing on the platform");
+            double y = chimpanzee.getY();
+            // Try to walk two blocks off the edge in one go
+            chimpanzee.move(MoverType.SELF, new Vec3(2.0, 0.0, 0.0));
+            helper.runAfterDelay(20, () -> {
+                helper.assertTrue(Math.abs(chimpanzee.getY() - y) < 0.01, "chimpanzee walked off the ledge and fell");
+                helper.succeed();
+            });
+        });
     }
 
     /**

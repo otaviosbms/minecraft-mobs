@@ -102,7 +102,7 @@ As texturas são geradas por código em `tools/textures/`, todas no mesmo estilo
 |---|---|
 | `MobTexture.java` | Base comum: ruído em duas camadas, estrias, rugas em espiral, faces de cima mais claras e de baixo mais escuras, uma paleta por variante e o ovo de spawn |
 | `ElephantTexture.java` | Elefante (256×256) |
-| `ChimpanzeeTexture.java` | Chimpanzé (128×128) e o ovo dele |
+| `ChimpanzeeTexture.java` | Chimpanzé (256×256, modelo em detalhe dobrado) e o ovo dele |
 
 Cada gerador documenta no topo o layout UV do modelo e grava `<mob>.png`, `<mob>_albino.png` e `<mob>_melanistic.png` com o mesmo desenho e paletas diferentes. Rode da raiz do projeto, passando a pasta de texturas:
 

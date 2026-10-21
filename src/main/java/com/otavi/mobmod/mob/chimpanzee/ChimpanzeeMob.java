@@ -16,8 +16,8 @@ public final class ChimpanzeeMob {
     public static final TagKey<Item> FOOD = TagKey.create(Registries.ITEM, MobMod.id("chimpanzee_food"));
 
     public static final MobDefinition<Chimpanzee> DEFINITION = MobDefinition.builder("chimpanzee", Chimpanzee::new, MobCategory.CREATURE)
-            // About 1.4 blocks tall walking on its knuckles; males are 15% bigger (ModAnimal)
-            .type(type -> type.sized(1.0f, 1.4f).eyeHeight(1.15f).clientTrackingRange(8))
+            // Real-life size: about 1 block tall walking on its knuckles; males are 15% bigger (ModAnimal)
+            .type(type -> type.sized(0.8f, 1.05f).eyeHeight(0.9f).clientTrackingRange(8))
             .attributes(Chimpanzee::createChimpanzeeAttributes)
             .spawn(SpawnRule.animal(BiomeTags.IS_JUNGLE, 8, 3, 6))
             .name("Chimpanzee", "Chimpanzé")
