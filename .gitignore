@@ -1,0 +1,76 @@
+# ---- Gradle ----
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# ---- Fabric Loom / Minecraft dev runs ----
+run/
+runs/
+run-*/
+out/
+bin/
+logs/
+*.log
+hs_err_*.log
+replay_pid*
+
+# ---- Datagen (arquivos gerados; remova esta linha se quiser versionar) ----
+# src/main/generated/
+.cache/
+
+# ---- Artefatos de build / releases ----
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# ---- IntelliJ IDEA ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# ---- Eclipse ----
+.classpath
+.project
+.settings/
+.metadata/
+
+# ---- VS Code ----
+.vscode/
+
+# ---- NetBeans ----
+nbproject/private/
+nbbuild/
+nbdist/
+
+# ---- Claude Code (configuração local) ----
+.claude/settings.local.json
+
+# ---- Segredos / ambiente local ----
+.env
+.env.*
+*.key
+*.pem
+local.properties
+gradle-local.properties
+
+# ---- Sistema operacional ----
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*~
+*.swp
+*.tmp
+*.bak
+
+# ---- Arte em edição (opcional) ----
+*.psd
+*.xcf
+*.blend1
+*.bbmodel.bak

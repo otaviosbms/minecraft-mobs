@@ -1,0 +1,61 @@
+plugins {
+    id "net.fabricmc.fabric-loom" version "${loom_version}"
+}
+
+group = maven_group
+version = project.version
+
+base {
+    archivesName = mod_id
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/mobmod.accesswidener")
+
+    // Client-only code lives in src/client so it can't leak into server code
+    splitEnvironmentSourceSets()
+
+    mods {
+        "mobmod" {
+            sourceSet sourceSets.main
+            sourceSet sourceSets.client
+        }
+    }
+
+    runs {
+        // Boots a server, runs the game tests and exits: a quick way to check that the mod loads
+        gameTestServer {
+            server()
+            name = "Game Test Server"
+            vmArg "-Dfabric-api.gametest"
+            runDir "build/gametest"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 25
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
