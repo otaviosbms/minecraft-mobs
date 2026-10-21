@@ -104,6 +104,9 @@ Os chimpanzés sobem nas árvores com frequência e passam um tempo na copa:
 | Subir | Agarra o tronco e sobe pela coluna ao lado dele (0,12 bloco/tick, cerca de 2,4 blocos/s), **atravessando a folhagem desta árvore**, até o primeiro espaço livre acima dela (com 2 blocos de altura). Se algo bloquear o caminho antes ou logo acima da copa, a árvore é ignorada. Enquanto sobe não tem colisão nem gravidade, então as folhas não o bloqueiam e ele não cai. Ele é marcado como fora do chão, o que liga a animação de escalada no cliente. Essa etapa não é interrompida |
 | Ficar na copa | Fica lá em cima de **30 a 90 s**: passeia pela copa (a segurança contra quedas não deixa cair), olha ao redor e pode jogar fezes |
 | Descer | Quando o tempo acaba (`ClimbDownTreeGoal`), procura o tronco mais próximo (até 3 blocos) e desce ao lado dele, de novo atravessando a folhagem (0,15 bloco/tick), até o chão de verdade. Sem tronco perto, desce reto pela própria coluna. Não toma dano de queda |
+| Destravar | A escalada de aranha (encostando no tronco ao passear ou ao caminhar até a árvore) para no primeiro "teto". Se ele estiver agarrado na parede com **folhas ou tronco logo acima da cabeça** (onde o tronco encontra a copa), ou **dentro da folhagem** (por exemplo, se o mundo foi recarregado no meio de uma subida), ele continua subindo pela folhagem até o topo da copa e começa a estadia lá em cima. Se o "teto" não for de árvore (uma saliência de pedra, por exemplo), ele solta a parede depois de 1 s agarrado sem conseguir subir |
+
+A subida e a descida pelo tronco são conduzidas pelo próprio chimpanzé, a cada tick, até o fim: mesmo que o goal que as começou seja interrompido, ele sempre termina em cima da copa ou no chão.
 
 Ele conta como "na árvore" quando está sobre folhas ou troncos com o chão de verdade a 3 blocos ou mais abaixo. Filhotes também sobem. Se for provocado na copa, o ataque tem prioridade e ele pode pular para perseguir o alvo.
 
@@ -303,6 +306,8 @@ Testes específicos:
 |---|---|
 | `chimpanzeeDoesNotWalkOffHighLedges` | Sobre um bloco a 5 de altura, tenta movê-lo 2 blocos para fora e confirma que ele continua lá em cima |
 | `chimpanzeeClimbsUpAndDownTrees` | Monta uma árvore (tronco de 5 e copa de 2 camadas), pede uma subida e confirma que, durante a subida, ele fica no estado que liga a animação de escalada (escalando e fora do chão), e que termina em pé em cima da copa |
+| `chimpanzeeDoesNotGetStuckUnderTheCanopy` | Encostado no tronco, debaixo das folhas, é empurrado contra o tronco (escalada de aranha) e precisa terminar em pé em cima da copa, em vez de ficar preso na junção entre o tronco e as folhas |
+| `chimpanzeeInsideTheFoliageClimbsOut` | Colocado dentro da folhagem, como depois de recarregar o mundo no meio de uma subida, precisa sair por cima da copa |
 | `chimpanzeeClimbsDownWhenItsStayEnds` | Põe o chimpanzé na copa com o tempo esgotado e confirma que ele desce até o chão sem tomar dano |
 | `chimpanzeeThrowsFecesAtPlayers` | Arremessa fezes num alvo e confirma que o projétil aparece |
 

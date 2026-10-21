@@ -43,7 +43,7 @@ class ClimbDownTreeGoal extends Goal {
         this.done = false;
         if (this.target != null) {
             this.chimpanzee.getNavigation().stop();
-            this.chimpanzee.startTrunkSlide(this.target, DESCEND_SPEED);
+            this.chimpanzee.startTrunkSlide(this.target, DESCEND_SPEED, false);
         }
     }
 
@@ -67,16 +67,12 @@ class ClimbDownTreeGoal extends Goal {
         if (this.trunk != null) {
             this.chimpanzee.faceBlock(this.trunk);
         }
-        if (this.chimpanzee.tickTrunkSlide()) {
-            this.done = true;
-        }
+        // The chimpanzee moves itself along the trunk
+        this.done = !this.chimpanzee.isSlidingOnTrunk();
     }
 
     @Override
     public void stop() {
-        if (this.chimpanzee.isSlidingOnTrunk()) {
-            this.chimpanzee.stopTrunkSlide();
-        }
         this.target = null;
         this.trunk = null;
     }

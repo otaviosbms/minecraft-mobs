@@ -25,7 +25,6 @@ class ClimbTreeGoal extends Goal {
      */
     private static final int MIN_TREE_HEIGHT = 4;
     private static final int APPROACH_TIMEOUT = 300;
-    private static final double CLIMB_SPEED = 0.12;
     /**
      * Highest canopy (in blocks above the ground) the chimpanzee looks for.
      */
@@ -95,11 +94,9 @@ class ClimbTreeGoal extends Goal {
         }
         Vec3 side = Vec3.atBottomCenterOf(this.spot.side());
         if (this.climbing) {
+            // The chimpanzee moves itself along the trunk and starts its stay on the canopy when it gets there
             this.chimpanzee.faceBlock(this.spot.trunk());
-            if (this.chimpanzee.tickTrunkSlide()) {
-                this.done = true;
-                this.chimpanzee.startTreeStay();
-            }
+            this.done = !this.chimpanzee.isSlidingOnTrunk();
             return;
         }
         this.timeout--;
@@ -109,7 +106,7 @@ class ClimbTreeGoal extends Goal {
             // At the foot of the trunk: grab it and climb through the foliage up to the top of the canopy
             this.climbing = true;
             this.chimpanzee.getNavigation().stop();
-            this.chimpanzee.startTrunkSlide(new Vec3(side.x, this.spot.topY(), side.z), CLIMB_SPEED);
+            this.chimpanzee.startTrunkSlide(new Vec3(side.x, this.spot.topY(), side.z), Chimpanzee.TRUNK_CLIMB_SPEED, true);
         } else if (this.chimpanzee.getNavigation().isDone()) {
             this.moveToSide();
         }
@@ -117,9 +114,6 @@ class ClimbTreeGoal extends Goal {
 
     @Override
     public void stop() {
-        if (this.chimpanzee.isSlidingOnTrunk()) {
-            this.chimpanzee.stopTrunkSlide();
-        }
         this.spot = null;
     }
 

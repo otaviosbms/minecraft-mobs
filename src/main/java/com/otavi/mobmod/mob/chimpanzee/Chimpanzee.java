@@ -70,6 +70,12 @@ public class Chimpanzee extends ModAnimal {
      * Height above the ground (in blocks, under the leaves) from which the chimpanzee counts as being up a tree.
      */
     private static final int IN_TREE_HEIGHT = 3;
+    static final double TRUNK_CLIMB_SPEED = 0.12;
+    /**
+     * Clinging to a wall with something that is not a tree right above its head for this long, it lets go.
+     */
+    private static final int STUCK_CLIMBING_TICKS = 20;
+    private static final int LET_GO_TICKS = 40;
     /**
      * Time between two throws by the same chimpanzee: 120 to 240 seconds.
      */
@@ -100,6 +106,9 @@ public class Chimpanzee extends ModAnimal {
     @Nullable
     private Vec3 slideTarget;
     private double slideSpeed;
+    private boolean slideToCanopy;
+    private int stuckClimbingTicks;
+    private int letGoTicks;
     private boolean forceClimb;
     private boolean forceThrow;
     private int fecesTime;
@@ -166,8 +175,62 @@ public class Chimpanzee extends ModAnimal {
     public void tick() {
         super.tick();
         if (!this.level().isClientSide()) {
-            this.entityData.set(DATA_CLIMBING, this.horizontalCollision || this.isSlidingOnTrunk());
+            if (this.isSlidingOnTrunk()) {
+                // The slide runs on its own: it always ends on the canopy or on the ground, even if a goal stops
+                boolean toCanopy = this.slideToCanopy;
+                if (this.tickTrunkSlide() && toCanopy) {
+                    this.startTreeStay();
+                }
+            } else {
+                this.getUnstuck();
+            }
+            if (this.letGoTicks > 0) {
+                this.letGoTicks--;
+            }
+            this.entityData.set(DATA_CLIMBING, (this.horizontalCollision && this.letGoTicks == 0) || this.isSlidingOnTrunk());
         }
+    }
+
+    /**
+     * Climbing a wall like a spider can end against a ceiling: right where a trunk meets the first layer of leaves.
+     * <ul>
+     *     <li>Under the leaves of a tree, or inside them (after a world reload in the middle of a climb), the chimpanzee
+     *     climbs on through the foliage to the top of the canopy, like {@link ClimbTreeGoal} does.</li>
+     *     <li>Under anything else (a stone overhang...), it lets go of the wall after a moment.</li>
+     * </ul>
+     */
+    private void getUnstuck() {
+        boolean clingingUnderCeiling = !this.onGround() && this.onClimbable()
+                && !this.level().noCollision(this, this.getBoundingBox().move(0.0, 0.05, 0.0));
+        if (clingingUnderCeiling && this.hasTreeBlockIn(this.getBoundingBox().move(0.0, 0.05, 0.0)) || this.hasTreeBlockIn(this.getBoundingBox().deflate(0.05))) {
+            BlockPos column = this.blockPosition();
+            int top = ClimbTreeGoal.canopyTop(this.level(), column);
+            if (top > this.getY()) {
+                this.stuckClimbingTicks = 0;
+                this.startTrunkSlide(new Vec3(column.getX() + 0.5, top, column.getZ() + 0.5), TRUNK_CLIMB_SPEED, true);
+                return;
+            }
+        }
+        if (clingingUnderCeiling && ++this.stuckClimbingTicks > STUCK_CLIMBING_TICKS) {
+            this.stuckClimbingTicks = 0;
+            this.letGoTicks = LET_GO_TICKS;
+        } else if (!clingingUnderCeiling) {
+            this.stuckClimbingTicks = 0;
+        }
+    }
+
+    /**
+     * True when a leaves or log block with a collision shape intersects {@code box}.
+     */
+    private boolean hasTreeBlockIn(AABB box) {
+        var level = this.level();
+        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX, box.maxY, box.maxZ))) {
+            var state = level.getBlockState(pos);
+            if ((state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS)) && state.getCollisionShape(level, pos).bounds().move(pos).intersects(box)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -219,11 +282,13 @@ public class Chimpanzee extends ModAnimal {
 
     /**
      * Climbs straight along a trunk, through the foliage, towards {@code target}: no collision and no gravity
-     * while it holds the trunk, so leaves do not block it and it never falls.
+     * while it holds the trunk, so leaves do not block it and it never falls. The chimpanzee moves itself every tick
+     * until it gets there; when {@code toCanopy} is true it then starts its stay up in the tree.
      */
-    void startTrunkSlide(Vec3 target, double speed) {
+    void startTrunkSlide(Vec3 target, double speed, boolean toCanopy) {
         this.slideTarget = target;
         this.slideSpeed = speed;
+        this.slideToCanopy = toCanopy;
         this.noPhysics = true;
         this.setNoGravity(true);
         this.setOnGround(false);
@@ -254,6 +319,7 @@ public class Chimpanzee extends ModAnimal {
 
     void stopTrunkSlide() {
         this.slideTarget = null;
+        this.slideToCanopy = false;
         this.noPhysics = false;
         this.setNoGravity(false);
         this.resetFallDistance();

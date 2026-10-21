@@ -152,6 +152,52 @@ public class MobGameTests {
         });
     }
 
+    /**
+     * A chimpanzee that climbs a trunk like a spider (walking into it) used to get stuck under the first layer of
+     * leaves, right where the trunk meets the canopy.
+     */
+    @GameTest(maxTicks = 400)
+    public void chimpanzeeDoesNotGetStuckUnderTheCanopy(GameTestHelper helper) {
+        buildTree(helper);
+        // Right next to the trunk, under the leaves, pushing towards the top of the trunk
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(5, 0, 4));
+        var trunkTop = helper.absoluteVec(new Vec3(5.5, 6.0, 5.5));
+        helper.succeedWhen(() -> {
+            if (!chimpanzee.isInTree()) {
+                chimpanzee.getNavigation().moveTo(trunkTop.x, trunkTop.y, trunkTop.z, 1.0);
+            }
+            helper.assertTrue(chimpanzee.isInTree(), "chimpanzee is stuck at " + chimpanzee.position().subtract(helper.absoluteVec(Vec3.ZERO)));
+        });
+    }
+
+    /**
+     * The trunk slide is not saved: a chimpanzee reloaded in the middle of the foliage must still get out on top.
+     */
+    @GameTest(maxTicks = 200)
+    public void chimpanzeeInsideTheFoliageClimbsOut(GameTestHelper helper) {
+        buildTree(helper);
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new Vec3(4.5, 4.2, 4.5));
+        helper.succeedWhen(() -> helper.assertTrue(chimpanzee.isInTree(), "chimpanzee is stuck at " + chimpanzee.position().subtract(helper.absoluteVec(Vec3.ZERO))));
+    }
+
+    /**
+     * Jungle-like tree: a trunk 5 logs high, with two layers of leaves around its top that overhang the trunk sides.
+     */
+    private static void buildTree(GameTestHelper helper) {
+        for (int y = 0; y < 5; y++) {
+            helper.setBlock(new BlockPos(5, y, 5), Blocks.JUNGLE_LOG);
+        }
+        for (int x = 4; x <= 6; x++) {
+            for (int z = 4; z <= 6; z++) {
+                for (int y = 4; y <= 5; y++) {
+                    if (x != 5 || z != 5 || y == 5) {
+                        helper.setBlock(new BlockPos(x, y, z), Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true));
+                    }
+                }
+            }
+        }
+    }
+
     @GameTest(maxTicks = 400)
     public void chimpanzeeClimbsDownWhenItsStayEnds(GameTestHelper helper) {
         for (int y = 0; y < 5; y++) {
