@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "mobmod",
   "version": "${version}",
-  "name": "Mob Mod",
+  "name": "Minecraft Mobs",
   "description": "Adds an elephant to the savannas.",
   "authors": [
     "Otavi"

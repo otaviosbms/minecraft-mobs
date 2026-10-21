@@ -1,4 +1,4 @@
-# Documentação do Mob Mod
+# Documentação do Minecraft Mobs
 
 Índice de toda a documentação do projeto. Novos documentos devem ser colocados na pasta da categoria correspondente e listados aqui.
 
