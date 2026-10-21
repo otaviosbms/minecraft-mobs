@@ -4,8 +4,8 @@ import com.otavi.mobmod.core.ModItems;
 import com.otavi.mobmod.entity.genetics.ModAnimal;
 import com.otavi.mobmod.entity.goal.AdultMeleeAttackGoal;
 import com.otavi.mobmod.entity.goal.BabyPanicGoal;
-import com.otavi.mobmod.item.coconut.CoconutItem;
-import com.otavi.mobmod.item.coconut.ThrownCoconut;
+import com.otavi.mobmod.item.feces.FecesItem;
+import com.otavi.mobmod.item.feces.ThrownFeces;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -38,13 +38,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A neutral jungle ape: it lives in troops, climbs walls like a spider, goes up trees often to spend time on the
- * canopy ({@link ClimbTreeGoal}, {@link ClimbDownTreeGoal}), now and then throws a coconut at a nearby player
- * ({@link ThrowCoconutGoal}), and the whole troop fights back when one of them gets hurt.
+ * canopy ({@link ClimbTreeGoal}, {@link ClimbDownTreeGoal}), now and then throws feces at a nearby player
+ * ({@link ThrowFecesGoal}), and the whole troop fights back when one of them gets hurt.
  * <p>
  * It never walks off a ledge higher than {@link #SAFE_DROP} blocks by accident (wandering, following, fleeing),
  * so it does not fall from the treetops it climbs. Only while chasing a target it may jump down.
@@ -69,10 +71,15 @@ public class Chimpanzee extends ModAnimal {
      */
     private static final int IN_TREE_HEIGHT = 3;
     /**
-     * Time between two coconuts thrown by the same chimpanzee: 60 to 120 seconds.
+     * Time between two throws by the same chimpanzee: 120 to 240 seconds.
      */
-    private static final int THROW_COOLDOWN_MIN = 1200;
-    private static final int THROW_COOLDOWN_MAX = 2400;
+    private static final int THROW_COOLDOWN_MIN = 2400;
+    private static final int THROW_COOLDOWN_MAX = 4800;
+    /**
+     * Adults leave feces on the ground every 5 to 10 minutes, like chickens lay eggs: that is where players get them.
+     */
+    private static final int FECES_TIME_MIN = 6000;
+    private static final int FECES_TIME_MAX = 12000;
 
     /**
      * Highest drop (in blocks) the chimpanzee walks down on its own.
@@ -95,9 +102,11 @@ public class Chimpanzee extends ModAnimal {
     private double slideSpeed;
     private boolean forceClimb;
     private boolean forceThrow;
+    private int fecesTime;
 
     public Chimpanzee(EntityType<? extends Chimpanzee> type, Level level) {
         super(type, level);
+        this.fecesTime = this.nextFecesTime();
     }
 
     /*========*/
@@ -122,7 +131,7 @@ public class Chimpanzee extends ModAnimal {
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.2, stack -> stack.is(ChimpanzeeMob.FOOD), false));
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.2));
         this.goalSelector.addGoal(4, new ClimbDownTreeGoal(this));
-        this.goalSelector.addGoal(4, new ThrowCoconutGoal(this));
+        this.goalSelector.addGoal(4, new ThrowFecesGoal(this));
         this.goalSelector.addGoal(4, new ClimbTreeGoal(this));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
@@ -217,6 +226,7 @@ public class Chimpanzee extends ModAnimal {
         this.slideSpeed = speed;
         this.noPhysics = true;
         this.setNoGravity(true);
+        this.setOnGround(false);
     }
 
     /**
@@ -231,6 +241,8 @@ public class Chimpanzee extends ModAnimal {
         double dx = Mth.clamp(this.slideTarget.x - position.x, -0.1, 0.1);
         double dz = Mth.clamp(this.slideTarget.z - position.z, -0.1, 0.1);
         this.setDeltaMovement(Vec3.ZERO);
+        // Without physics nothing updates onGround: clear it so the client plays the climbing animation
+        this.setOnGround(false);
         if (Math.abs(dy) <= this.slideSpeed && Math.abs(dx) < 0.1 && Math.abs(dz) < 0.1) {
             this.setPos(this.slideTarget);
             this.stopTrunkSlide();
@@ -281,10 +293,10 @@ public class Chimpanzee extends ModAnimal {
     }
 
     /*==============*/
-    /*   COCONUTS   */
+    /*   FECES   */
     /*==============*/
 
-    boolean canThrowCoconut() {
+    boolean canThrowFeces() {
         return this.throwCooldown <= 0;
     }
 
@@ -293,27 +305,27 @@ public class Chimpanzee extends ModAnimal {
     }
 
     /**
-     * Makes the next {@link ThrowCoconutGoal} check succeed instead of rolling its chance (used by tests).
+     * Makes the next {@link ThrowFecesGoal} check succeed instead of rolling its chance (used by tests).
      */
-    public void requestCoconutThrow() {
+    public void requestFecesThrow() {
         this.forceThrow = true;
         this.throwCooldown = 0;
     }
 
     /**
-     * Throws a coconut at the target with a small arc, like a snow golem throws snowballs.
+     * Throws feces at the target with a small arc, like a snow golem throws snowballs.
      */
-    public void throwCoconutAt(LivingEntity target) {
+    public void throwFecesAt(LivingEntity target) {
         if (!(this.level() instanceof ServerLevel level)) {
             return;
         }
-        var stack = new ItemStack(ModItems.COCONUT);
-        var coconut = new ThrownCoconut(level, this, stack);
+        var stack = new ItemStack(ModItems.FECES);
+        var feces = new ThrownFeces(level, this, stack);
         double dx = target.getX() - this.getX();
-        double dy = target.getEyeY() - 1.1 - coconut.getY();
+        double dy = target.getEyeY() - 1.1 - feces.getY();
         double dz = target.getZ() - this.getZ();
         double arc = Math.sqrt(dx * dx + dz * dz) * 0.2;
-        Projectile.spawnProjectileUsingShoot(coconut, level, stack, dx, dy + arc, dz, CoconutItem.PROJECTILE_SHOOT_POWER, 8.0F);
+        Projectile.spawnProjectileUsingShoot(feces, level, stack, dx, dy + arc, dz, FecesItem.PROJECTILE_SHOOT_POWER, 8.0F);
         this.playSound(SoundEvents.SNOWBALL_THROW, 0.6F, 0.4F / (this.random.nextFloat() * 0.4F + 0.8F));
         level.broadcastEntityEvent(this, THROW_EVENT);
         this.throwTick = THROW_LENGTH;
@@ -428,6 +440,27 @@ public class Chimpanzee extends ModAnimal {
         if (this.treeStayTicks > 0) {
             this.treeStayTicks--;
         }
+        if (this.level() instanceof ServerLevel level && this.isAlive() && !this.isBaby() && --this.fecesTime <= 0) {
+            this.spawnAtLocation(level, ModItems.FECES);
+            this.playSound(SoundEvents.SLIME_SQUISH_SMALL, 1.0F, (this.random.nextFloat() - this.random.nextFloat()) * 0.2F + 1.0F);
+            this.fecesTime = this.nextFecesTime();
+        }
+    }
+
+    private int nextFecesTime() {
+        return FECES_TIME_MIN + this.random.nextInt(FECES_TIME_MAX - FECES_TIME_MIN);
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("FecesTime", this.fecesTime);
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        this.fecesTime = input.getIntOr("FecesTime", this.nextFecesTime());
     }
 
     public int getAttackAnimationTick() {

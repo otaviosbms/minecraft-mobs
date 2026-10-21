@@ -37,9 +37,9 @@ minecraft-mobs/
 | `core/SpawnRule.java` | Onde e como o mob nasce (biomas, peso, grupo, placement). `SpawnRule.animal(...)` cobre animais terrestres |
 | `core/Translation.java` | Texto em todos os idiomas do mod (`en_us`, `pt_br`) |
 | `core/MobLoot.java` | Função que monta a loot table do mob (usada só pelo datagen) |
-| `core/ModItems.java` | Itens que não são ovos (ex.: coco), com nome, aba criativa e modelo gerados pelo datagen |
-| `core/ModEntityTypes.java` | Entidades que não são mobs (ex.: o projétil do coco) |
-| `item/<nome>/` | Um pacote por item com comportamento próprio (ex.: `item/coconut/`: item e projétil) |
+| `core/ModItems.java` | Itens que não são ovos (ex.: fezes), com nome, aba criativa e modelo gerados pelo datagen |
+| `core/ModEntityTypes.java` | Entidades que não são mobs (ex.: o projétil das fezes) |
+| `item/<nome>/` | Um pacote por item com comportamento próprio (ex.: `item/feces/`: item e projétil) |
 | `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais, com reprodução macho + fêmea). Veja [genetica.md](genetica.md) |
 | `entity/goal/` | Goals de IA reaproveitáveis por vários mobs (`AdultMeleeAttackGoal`, `BabyPanicGoal`) |
 | `mob/<nome>/` | Um pacote por mob: a classe da entidade e o `<Nome>Mob` com a `MobDefinition` |
@@ -106,7 +106,7 @@ As texturas são geradas por código em `tools/textures/`, todas no mesmo estilo
 | `MobTexture.java` | Base comum: ruído em duas camadas, estrias, rugas em espiral, faces de cima mais claras e de baixo mais escuras, uma paleta por variante e o ovo de spawn |
 | `ElephantTexture.java` | Elefante (256×256) |
 | `ChimpanzeeTexture.java` | Chimpanzé (256×256, modelo em detalhe dobrado) e o ovo dele |
-| `CoconutTexture.java` | Item coco (16×16) |
+| `FecesTexture.java` | Item fezes (16×16) |
 
 Cada gerador documenta no topo o layout UV do modelo e grava `<mob>.png`, `<mob>_albino.png` e `<mob>_melanistic.png` com o mesmo desenho e paletas diferentes. Rode da raiz do projeto, passando a pasta de texturas:
 

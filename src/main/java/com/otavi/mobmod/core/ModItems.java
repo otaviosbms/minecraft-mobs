@@ -1,7 +1,7 @@
 package com.otavi.mobmod.core;
 
 import com.otavi.mobmod.MobMod;
-import com.otavi.mobmod.item.coconut.CoconutItem;
+import com.otavi.mobmod.item.feces.FecesItem;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,8 +29,8 @@ public final class ModItems {
     /**
      * Thrown by chimpanzees (and players) like a snowball.
      */
-    public static final Item COCONUT = register("coconut", CoconutItem::new, new Item.Properties().stacksTo(16),
-            new Translation("Coconut", "Coco"), CreativeModeTabs.COMBAT, Items.SNOWBALL);
+    public static final Item FECES = register("feces", FecesItem::new, new Item.Properties().stacksTo(16),
+            new Translation("Feces", "Fezes"), CreativeModeTabs.COMBAT, Items.SNOWBALL);
 
     public record Entry(Item item, Translation name, ResourceKey<CreativeModeTab> tab, Item after) {
     }
@@ -42,7 +42,7 @@ public final class ModItems {
         for (var entry : ALL) {
             CreativeModeTabEvents.modifyOutputEvent(entry.tab()).register(output -> output.insertAfter(entry.after(), entry.item()));
         }
-        DispenserBlock.registerProjectileBehavior(COCONUT);
+        DispenserBlock.registerProjectileBehavior(FECES);
     }
 
     private static <I extends Item> I register(String name, Function<Item.Properties, I> factory, Item.Properties properties,

@@ -137,12 +137,18 @@ public class MobGameTests {
         var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(1, 0, 5));
         double groundY = chimpanzee.getY();
         chimpanzee.requestTreeClimb();
+        // The client plays the climbing animation when the chimpanzee is climbable and off the ground
+        boolean[] animated = {false};
         helper.succeedWhen(() -> {
+            if (chimpanzee.isSlidingOnTrunk() && chimpanzee.onClimbable() && !chimpanzee.onGround()) {
+                animated[0] = true;
+            }
             if (chimpanzee.getY() < groundY + 5.5) {
                 // Still on its way up: keep waiting
                 helper.assertTrue(false, "chimpanzee did not reach the canopy");
             }
             helper.assertTrue(chimpanzee.isInTree(), "chimpanzee is up but not standing on the canopy");
+            helper.assertTrue(animated[0], "chimpanzee climbed the trunk without the climbing animation state");
         });
     }
 
@@ -166,11 +172,11 @@ public class MobGameTests {
     }
 
     @GameTest
-    public void chimpanzeeThrowsCoconutsAtPlayers(GameTestHelper helper) {
+    public void chimpanzeeThrowsFecesAtPlayers(GameTestHelper helper) {
         var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(1, 0, 1));
         var target = helper.spawn(EntityTypes.PIG, new BlockPos(6, 0, 6));
-        chimpanzee.throwCoconutAt(target);
-        helper.assertEntityPresent(ModEntityTypes.COCONUT);
+        chimpanzee.throwFecesAt(target);
+        helper.assertEntityPresent(ModEntityTypes.FECES);
         helper.succeed();
     }
 

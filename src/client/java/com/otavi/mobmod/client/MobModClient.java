@@ -11,6 +11,6 @@ public class MobModClient implements ClientModInitializer {
     public void onInitializeClient() {
         ModMobsClient.init();
         // Projectiles are drawn as their item, like vanilla snowballs
-        EntityRenderers.register(ModEntityTypes.COCONUT, ThrownItemRenderer::new);
+        EntityRenderers.register(ModEntityTypes.FECES, ThrownItemRenderer::new);
     }
 }

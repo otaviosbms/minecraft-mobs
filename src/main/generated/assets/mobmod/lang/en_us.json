@@ -1,10 +1,10 @@
 {
   "entity.mobmod.chimpanzee": "Chimpanzee",
-  "entity.mobmod.coconut": "Coconut",
   "entity.mobmod.elephant": "Elephant",
+  "entity.mobmod.feces": "Feces",
   "item.mobmod.chimpanzee_spawn_egg": "Chimpanzee Spawn Egg",
-  "item.mobmod.coconut": "Coconut",
   "item.mobmod.elephant_spawn_egg": "Elephant Spawn Egg",
+  "item.mobmod.feces": "Feces",
   "mobmod.sex.female": "Female",
   "mobmod.sex.male": "Male",
   "mobmod.skin_variant.albino": "Albino",

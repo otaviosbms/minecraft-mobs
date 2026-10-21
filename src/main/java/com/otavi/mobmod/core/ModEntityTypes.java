@@ -1,7 +1,7 @@
 package com.otavi.mobmod.core;
 
 import com.otavi.mobmod.MobMod;
-import com.otavi.mobmod.item.coconut.ThrownCoconut;
+import com.otavi.mobmod.item.feces.ThrownFeces;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -14,7 +14,7 @@ import net.minecraft.world.entity.MobCategory;
  * Entities that are not mobs (projectiles...). Mobs are declared with a {@link MobDefinition} in {@link ModMobs}.
  */
 public final class ModEntityTypes {
-    public static final EntityType<ThrownCoconut> COCONUT = register("coconut", EntityType.Builder.<ThrownCoconut>of(ThrownCoconut::new, MobCategory.MISC)
+    public static final EntityType<ThrownFeces> FECES = register("feces", EntityType.Builder.<ThrownFeces>of(ThrownFeces::new, MobCategory.MISC)
             // Same settings as the vanilla snowball
             .noLootTable()
             .sized(0.25F, 0.25F)

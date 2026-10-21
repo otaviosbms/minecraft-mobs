@@ -31,8 +31,8 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 - **Spawn:** biomas de selva.
 - **Reprodução:** maçã, fatia de melancia, bagas doces, bagas brilhantes e sementes de cacau. Só um macho e uma fêmea geram filhotes.
 - **Árvores:** sobe com frequência nas árvores, atravessando a folhagem pelo tronco, fica de 30 a 90 s na copa e depois desce sem se machucar.
-- **Coco:** chance baixa de jogar um coco num jogador próximo. O coco funciona como a bola de neve (empurra, sem dano) e o jogador também pode arremessá-lo.
-- **Drops:** 0 a 1 coco.
+- **Fezes:** chance baixa de jogar fezes num jogador próximo (em média uma vez por minuto). Funcionam como a bola de neve (empurram, sem dano) e o jogador também pode arremessá-las. Os adultos deixam fezes no chão a cada 5 a 10 minutos, como a galinha bota ovos.
+- **Drops:** nenhum item.
 
 Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chimpanze.md).
 

@@ -9,6 +9,6 @@ Ficha completa de cada mob do mod: atributos, IA, reprodução, variantes, spawn
 
 Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md).
 
-Itens do mod: o **coco** (`mobmod:coconut`), jogado pelos chimpanzés, está documentado na [ficha do Chimpanzé](chimpanze.md#coco).
+Itens do mod: as **fezes** (`mobmod:feces`), jogadas pelos chimpanzés, estão documentadas na [ficha do Chimpanzé](chimpanze.md#fezes).
 
 Para documentar um mob novo, copie o [modelo](_modelo.md).

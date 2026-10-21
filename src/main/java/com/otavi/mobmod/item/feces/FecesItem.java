@@ -1,4 +1,4 @@
-package com.otavi.mobmod.item.coconut;
+package com.otavi.mobmod.item.feces;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -18,10 +18,10 @@ import net.minecraft.world.level.Level;
 /**
  * Thrown like a snowball: same sound, same power and spread, one item per throw. Dispensers can shoot it too.
  */
-public class CoconutItem extends Item implements ProjectileItem {
+public class FecesItem extends Item implements ProjectileItem {
     public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 
-    public CoconutItem(Properties properties) {
+    public FecesItem(Properties properties) {
         super(properties);
     }
 
@@ -31,7 +31,7 @@ public class CoconutItem extends Item implements ProjectileItem {
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL,
                 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (level instanceof ServerLevel serverLevel) {
-            Projectile.spawnProjectileFromRotation(ThrownCoconut::new, serverLevel, stack, player, 0.0F, PROJECTILE_SHOOT_POWER, 1.0F);
+            Projectile.spawnProjectileFromRotation(ThrownFeces::new, serverLevel, stack, player, 0.0F, PROJECTILE_SHOOT_POWER, 1.0F);
         }
         player.awardStat(Stats.ITEM_USED.get(this));
         stack.consume(1, player);
@@ -40,6 +40,6 @@ public class CoconutItem extends Item implements ProjectileItem {
 
     @Override
     public Projectile asProjectile(Level level, Position position, ItemStack stack, Direction direction) {
-        return new ThrownCoconut(level, position.x(), position.y(), position.z(), stack);
+        return new ThrownFeces(level, position.x(), position.y(), position.z(), stack);
     }
 }

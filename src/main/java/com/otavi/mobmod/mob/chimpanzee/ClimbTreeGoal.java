@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +26,10 @@ class ClimbTreeGoal extends Goal {
     private static final int MIN_TREE_HEIGHT = 4;
     private static final int APPROACH_TIMEOUT = 300;
     private static final double CLIMB_SPEED = 0.12;
+    /**
+     * Highest canopy (in blocks above the ground) the chimpanzee looks for.
+     */
+    private static final int MAX_CLIMB_HEIGHT = 32;
 
     private final Chimpanzee chimpanzee;
     @Nullable
@@ -144,7 +147,7 @@ class ClimbTreeGoal extends Goal {
                 if (!isStandable(level, side)) {
                     continue;
                 }
-                int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, side.getX(), side.getZ());
+                int top = canopyTop(level, side);
                 if (top - side.getY() < MIN_TREE_HEIGHT) {
                     continue;
                 }
@@ -156,6 +159,31 @@ class ClimbTreeGoal extends Goal {
             }
         }
         return best;
+    }
+
+    /**
+     * Goes up the column next to the trunk, through the leaves and logs of this tree, and returns the first free spot
+     * above them with room for the chimpanzee. Returns a value below the column if there is no canopy or no room on
+     * top (something else blocks the way before or right above the canopy).
+     */
+    static int canopyTop(Level level, BlockPos side) {
+        boolean inCanopy = false;
+        var cursor = side.mutable();
+        for (int i = 0; i < MAX_CLIMB_HEIGHT; i++, cursor.move(0, 1, 0)) {
+            var state = level.getBlockState(cursor);
+            if (state.is(BlockTags.LEAVES) || state.is(BlockTags.LOGS)) {
+                inCanopy = true;
+            } else if (!isFree(level, cursor)) {
+                return Integer.MIN_VALUE;
+            } else if (inCanopy) {
+                return isFree(level, cursor.above()) ? cursor.getY() : Integer.MIN_VALUE;
+            }
+        }
+        return Integer.MIN_VALUE;
+    }
+
+    private static boolean isFree(Level level, BlockPos pos) {
+        return level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
     }
 
     private static boolean isStandable(Level level, BlockPos pos) {

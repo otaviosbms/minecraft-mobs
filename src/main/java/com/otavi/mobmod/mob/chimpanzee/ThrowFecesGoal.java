@@ -7,14 +7,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 
 /**
- * Now and then, a chimpanzee near a player stops, stares at them for a moment and throws a coconut.
+ * Now and then, a chimpanzee near a player stops, stares at them for a moment and throws feces.
  * Low chance on purpose: about once every {@link #CHANCE} ticks while a player is in range, then a long cooldown.
  */
-class ThrowCoconutGoal extends Goal {
+class ThrowFecesGoal extends Goal {
     /**
-     * Average ticks between throws while a player is in range (30 s).
+     * Average ticks between throws while a player is in range (60 s).
      */
-    static final int CHANCE = 600;
+    static final int CHANCE = 1200;
     static final double RANGE = 12.0;
     private static final int WIND_UP = 15;
 
@@ -23,14 +23,14 @@ class ThrowCoconutGoal extends Goal {
     private Player player;
     private int windUp;
 
-    ThrowCoconutGoal(Chimpanzee chimpanzee) {
+    ThrowFecesGoal(Chimpanzee chimpanzee) {
         this.chimpanzee = chimpanzee;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
     @Override
     public boolean canUse() {
-        if (this.chimpanzee.isBaby() || !this.chimpanzee.canThrowCoconut() || this.chimpanzee.getTarget() != null
+        if (this.chimpanzee.isBaby() || !this.chimpanzee.canThrowFeces() || this.chimpanzee.getTarget() != null
                 || this.chimpanzee.isInLove() || this.chimpanzee.isSlidingOnTrunk()) {
             return false;
         }
@@ -69,7 +69,7 @@ class ThrowCoconutGoal extends Goal {
         // Stare at the target while winding up, then throw
         this.chimpanzee.getLookControl().setLookAt(this.player, 30.0F, 30.0F);
         if (--this.windUp <= 0) {
-            this.chimpanzee.throwCoconutAt(this.player);
+            this.chimpanzee.throwFecesAt(this.player);
         }
     }
 

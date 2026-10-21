@@ -32,7 +32,7 @@ public class ModLanguageProvider extends FabricLanguageProvider {
             builder.add(item.item(), item.name().get(this.locale));
         }
         // The thrown projectile shows up in death messages
-        builder.add(ModEntityTypes.COCONUT, new Translation("Coconut", "Coco").get(this.locale));
+        builder.add(ModEntityTypes.FECES, new Translation("Feces", "Fezes").get(this.locale));
 
         for (var mob : ModMobs.ALL) {
             var name = mob.displayName().get(this.locale);

@@ -1,4 +1,4 @@
-package com.otavi.mobmod.item.coconut;
+package com.otavi.mobmod.item.feces;
 
 import com.otavi.mobmod.core.ModEntityTypes;
 import com.otavi.mobmod.core.ModItems;
@@ -15,9 +15,9 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 /**
- * A thrown coconut. Works exactly like a snowball: knockback but no damage, and it breaks into item particles on impact.
+ * Thrown feces. Works exactly like a snowball: knockback but no damage, and it breaks into item particles on impact.
  */
-public class ThrownCoconut extends ThrowableItemProjectile {
+public class ThrownFeces extends ThrowableItemProjectile {
     /**
      * Same as a snowball, which only hurts blazes.
      */
@@ -25,21 +25,21 @@ public class ThrownCoconut extends ThrowableItemProjectile {
 
     private static final byte BREAK_EVENT = 3;
 
-    public ThrownCoconut(EntityType<? extends ThrownCoconut> type, Level level) {
+    public ThrownFeces(EntityType<? extends ThrownFeces> type, Level level) {
         super(type, level);
     }
 
-    public ThrownCoconut(Level level, LivingEntity owner, ItemStack stack) {
-        super(ModEntityTypes.COCONUT, owner, level, stack);
+    public ThrownFeces(Level level, LivingEntity owner, ItemStack stack) {
+        super(ModEntityTypes.FECES, owner, level, stack);
     }
 
-    public ThrownCoconut(Level level, double x, double y, double z, ItemStack stack) {
-        super(ModEntityTypes.COCONUT, x, y, z, level, stack);
+    public ThrownFeces(Level level, double x, double y, double z, ItemStack stack) {
+        super(ModEntityTypes.FECES, x, y, z, level, stack);
     }
 
     @Override
     protected Item getDefaultItem() {
-        return ModItems.COCONUT;
+        return ModItems.FECES;
     }
 
     @Override
