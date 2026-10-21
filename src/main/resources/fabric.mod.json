@@ -15,6 +15,12 @@
     ],
     "client": [
       "com.otavi.mobmod.client.MobModClient"
+    ],
+    "fabric-datagen": [
+      "com.otavi.mobmod.client.datagen.MobModDataGenerator"
+    ],
+    "fabric-gametest": [
+      "com.otavi.mobmod.gametest.MobGameTests"
     ]
   },
   "accessWidener": "mobmod.accesswidener",

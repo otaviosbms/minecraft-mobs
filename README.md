@@ -33,6 +33,7 @@ Requer **JDK 25**. Tudo roda pelo Gradle Wrapper; a primeira execução baixa o 
 
 ```bash
 ./gradlew build               # compila e gera build/libs/mobmod-0.1.0.jar
+./gradlew runDatagen          # regenera lang, loot tables, tags e modelos em src/main/generated
 ./gradlew runClient           # abre o Minecraft com o mod (pasta run/)
 ./gradlew runServer           # servidor de desenvolvimento
 ./gradlew runGameTestServer   # sobe um servidor, roda os gametests e sai
@@ -42,18 +43,25 @@ As versões do Minecraft, Loader e Fabric API ficam em [`gradle.properties`](gra
 
 ## Estrutura
 
+Cada mob vive no próprio pacote e é declarado uma vez numa `MobDefinition`. Registro, spawn, ovo, traduções, loot, tags e testes saem dessa definição.
+
 ```
-src/main/     código e recursos comuns (entidade, registros, loot table, tags, fabric.mod.json)
-src/client/   código e recursos só do cliente (renderer, modelo, texturas, lang)
-docs/         documentação do projeto
+src/main/java/.../core/          MobDefinition, SpawnRule e ModMobs (lista de todos os mobs)
+src/main/java/.../mob/<nome>/    entidade e definição de cada mob
+src/client/java/.../core/        ClientMob e ModMobsClient (lado cliente de todos os mobs)
+src/client/java/.../mob/<nome>/  modelo, renderer e registro cliente de cada mob
+src/client/java/.../datagen/     providers do datagen
+src/main/generated/              JSONs gerados pelo datagen (não editar à mão)
+docs/                            documentação do projeto
 ```
 
-A explicação detalhada de cada pasta, do build e de como adicionar um novo mob está em [`docs/`](docs/README.md).
+Adicionar um mob é criar as duas pastas dele, colocar uma linha em `ModMobs` e outra em `ModMobsClient`, e rodar `runDatagen`. O passo a passo está em [como adicionar um mob](docs/projeto/como-adicionar-um-mob.md).
 
 ## Documentação
 
 - [Índice da documentação](docs/README.md)
 - [Visão geral do projeto](docs/projeto/visao-geral.md)
+- [Como adicionar um mob](docs/projeto/como-adicionar-um-mob.md)
 - [Análise dos mobs do Promenade](docs/analises/analise-mobs-promenade.md) (referência usada na criação do mod)
 
 ## Licença

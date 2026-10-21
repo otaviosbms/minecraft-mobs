@@ -43,6 +43,13 @@ loom {
     }
 }
 
+fabricApi {
+    // runDatagen writes lang, loot tables, tags and item models to src/main/generated (committed, added to resources)
+    configureDataGeneration {
+        client = true
+    }
+}
+
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
     it.options.release = 25

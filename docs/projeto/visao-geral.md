@@ -2,76 +2,90 @@
 
 Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona um mob: o **Elefante** (`mobmod:elephant`), com ovo de spawn.
 
+A arquitetura foi pensada para **dezenas de mobs**: cada mob vive no seu próprio pacote e é declarado uma única vez numa `MobDefinition`; o resto (registro, spawn, aba criativa, traduções, loot, tags, modelos de item e testes) é derivado dessa definição. Para o passo a passo, veja [como-adicionar-um-mob.md](como-adicionar-um-mob.md).
+
 ## Estrutura de pastas
 
 ```
 minecraft-mobs/
-├── build.gradle            Script de build (Loom, source sets, runs, Java 25)
+├── build.gradle            Script de build (Loom, source sets, datagen, runs, Java 25)
 ├── gradle.properties       Versões e metadados (mod_id, version, Minecraft, Loader, Fabric API)
 ├── settings.gradle         Repositório de plugins (Fabric maven) e nome do projeto (mob-mod)
 ├── gradlew / gradlew.bat   Gradle Wrapper (usa Gradle 9.8.1)
 ├── gradle/wrapper/         Jar e propriedades do wrapper
 ├── docs/                   Esta documentação
 ├── src/
-│   ├── main/               Código e recursos comuns (cliente + servidor)
-│   └── client/             Código e recursos exclusivos do cliente
-├── build/                  GERADO – classes, resources, libs/mobmod-0.1.0.jar, gametest
+│   ├── main/
+│   │   ├── java/           Código comum (cliente + servidor)
+│   │   ├── resources/      fabric.mod.json e access widener (escritos à mão)
+│   │   └── generated/      GERADO PELO DATAGEN e versionado: lang, loot tables, tags, modelos de item
+│   └── client/
+│       ├── java/           Código só do cliente (renderers, modelos, datagen)
+│       └── resources/      Texturas (únicos assets escritos à mão)
+├── build/                  GERADO – classes, libs/mobmod-<versão>.jar, gametest
 └── .gradle/                GERADO – cache do Gradle/Loom
 ```
 
-`build/`, `.gradle/`, `run/`, `.idea/` etc. estão no `.gitignore`.
-
-### `src/main` (lado comum)
+## Código comum (`src/main/java/com/otavi/mobmod`)
 
 | Caminho | Função |
 |---|---|
-| `java/com/otavi/mobmod/MobMod.java` | Entrypoint `main` (`ModInitializer`): inicializa registros, atributos, spawn placement, spawn em biomas e aba criativa |
-| `java/.../entity/Elephant.java` | Classe do mob (`Animal`): atributos, goals de IA, ataque, sons |
-| `java/.../entity/ModEntityTypes.java` | Registro do `EntityType`, atributos, regras de spawn e spawn em savanas (peso 5, grupo 2–4) |
-| `java/.../item/ModItems.java` | Registro do ovo de spawn e inserção na aba de ovos criativa |
-| `resources/fabric.mod.json` | Metadados do mod, entrypoints e dependências (`${version}` é substituído no build) |
-| `resources/mobmod.accesswidener` | Abre `SpawnPlacements.register` (Fabric não tem evento para isso) |
-| `resources/data/mobmod/loot_table/entities/elephant.json` | Drops do elefante |
-| `resources/data/mobmod/tags/item/elephant_food.json` | Itens que atraem/alimentam o elefante |
+| `MobMod.java` | Entrypoint `main`. Só chama `ModMobs.init()` |
+| `core/MobDefinition.java` | Descreve um mob: tipo de entidade, atributos, regra de spawn, ovo, nome, comida e loot. O `build()` já registra o `EntityType` e o ovo |
+| `core/ModMobs.java` | **Lista de todos os mobs.** `init()` registra atributos, spawn placements, spawn em biomas e os ovos na aba criativa, em loop |
+| `core/SpawnRule.java` | Onde e como o mob nasce (biomas, peso, grupo, placement). `SpawnRule.animal(...)` cobre animais terrestres |
+| `core/Translation.java` | Texto em todos os idiomas do mod (`en_us`, `pt_br`) |
+| `core/MobLoot.java` | Função que monta a loot table do mob (usada só pelo datagen) |
+| `entity/goal/` | Goals de IA reaproveitáveis por vários mobs (`AdultMeleeAttackGoal`, `BabyPanicGoal`) |
+| `mob/<nome>/` | Um pacote por mob: a classe da entidade e o `<Nome>Mob` com a `MobDefinition` |
+| `gametest/MobGameTests.java` | Testes que percorrem `ModMobs.ALL`: spawna cada mob e confere a loot table |
 
-### `src/client` (somente cliente)
+## Código do cliente (`src/client/java/com/otavi/mobmod/client`)
 
 Separado por `splitEnvironmentSourceSets()` para que código de cliente nunca vaze para o servidor.
 
 | Caminho | Função |
 |---|---|
-| `java/.../client/MobModClient.java` | Entrypoint `client`: registra camadas de modelo e renderer |
-| `java/.../render/entity/ElephantRenderer.java` | Renderer do elefante |
-| `java/.../render/entity/model/ElephantModel.java` | Modelo 3D definido em código Java (sem Blockbench/GeckoLib) |
-| `java/.../render/entity/model/ModModelLayers.java` | Registro das camadas de modelo |
-| `java/.../render/entity/state/ElephantRenderState.java` | Estado de renderização (ex.: animação de ataque) |
-| `resources/assets/mobmod/textures/` | Texturas do elefante e do ovo de spawn |
-| `resources/assets/mobmod/items/`, `models/item/` | Definição/modelo do item do ovo |
-| `resources/assets/mobmod/lang/` | Traduções `en_us.json` e `pt_br.json` |
+| `MobModClient.java` | Entrypoint `client`. Só chama `ModMobsClient.init()` |
+| `core/ClientMob.java` | Interface do lado cliente de um mob: registra camadas de modelo e renderer |
+| `core/ModMobsClient.java` | **Lista do lado cliente de todos os mobs**, registrada em loop |
+| `mob/<nome>/` | Modelo (em código Java), render state, renderer e `<Nome>Client` |
+| `datagen/` | Entrypoint `fabric-datagen` e providers que geram JSON a partir de `ModMobs.ALL` |
+
+## Datagen
+
+`./gradlew runDatagen` abre o jogo em modo de geração de dados e escreve em `src/main/generated`:
+
+| Provider | Gera | A partir de |
+|---|---|---|
+| `ModLanguageProvider` | `assets/mobmod/lang/en_us.json`, `pt_br.json` | nome do mob, nome do ovo (automático), nome da tag de comida |
+| `ModEntityLootProvider` | `data/mobmod/loot_table/entities/<mob>.json` | `MobDefinition.loot(...)` |
+| `ModItemTagProvider` | `data/mobmod/tags/item/<mob>_food.json` | `MobDefinition.food(...)` |
+| `ModModelProvider` | `assets/mobmod/items/` e `models/item/` dos ovos | ovo de cada mob |
+
+A pasta `generated` é **versionada** (só o `.cache/` é ignorado), então o projeto compila sem rodar o datagen. Mesmo assim, **rode `runDatagen` sempre que mudar uma `MobDefinition`** e commite o resultado. Arquivos de mobs removidos são apagados automaticamente.
+
+Não edite nada dentro de `src/main/generated` à mão: será sobrescrito.
 
 ## Build
 
-Tudo roda pelo Gradle Wrapper (primeira execução baixa Gradle 9.8.1, Minecraft e dependências; precisa de JDK 25):
+Tudo roda pelo Gradle Wrapper (a primeira execução baixa Gradle 9.8.1, Minecraft e dependências; precisa de JDK 25):
 
 ```bash
-./gradlew build            # compila e gera build/libs/mobmod-0.1.0.jar
-./gradlew runClient        # abre o Minecraft com o mod (pasta run/)
-./gradlew runServer        # servidor de desenvolvimento
-./gradlew runGameTestServer   # sobe servidor, roda gametests e sai (smoke test de carga do mod)
+./gradlew build               # compila e gera build/libs/mobmod-0.1.0.jar
+./gradlew runDatagen          # regenera src/main/generated
+./gradlew runClient           # abre o Minecraft com o mod (pasta run/)
+./gradlew runServer           # servidor de desenvolvimento
+./gradlew runGameTestServer   # sobe um servidor, roda os gametests e sai
 ```
 
 Fluxo do build:
 
 1. Loom baixa e mapeia o Minecraft `26.3` (Mojang mappings) e aplica o access widener.
-2. `processResources` expande `${version}` em `fabric.mod.json` com a `version` do `gradle.properties`.
+2. `processResources` junta `src/main/resources` e `src/main/generated`, e expande `${version}` em `fabric.mod.json`.
 3. Compila `main` e `client` (UTF-8, `--release 25`); ambos entram no mesmo mod `mobmod`.
-4. O jar final sai em `build/libs/mobmod-<version>.jar` (nome vem de `base.archivesName = mod_id`).
+4. O jar final sai em `build/libs/mobmod-<version>.jar`.
 
-Para trocar de versão do Minecraft/Fabric, edite apenas `gradle.properties` (as versões foram copiadas do projeto de referência Promenade).
+O jar inclui as classes de datagen e de gametest, mas elas só rodam quando o Fabric é iniciado nesses modos (`runDatagen` / `runGameTestServer`).
 
-## Como adicionar um novo mob
-
-1. Classe da entidade em `entity/` + registro em `ModEntityTypes` (tipo, atributos, spawn placement, biomas).
-2. Ovo de spawn em `ModItems`.
-3. Cliente: modelo, render state, renderer, camada em `ModModelLayers` e registro em `MobModClient`.
-4. Recursos: textura, lang (en/pt), loot table, tags, modelo do item.
+Para trocar de versão do Minecraft/Fabric, edite apenas `gradle.properties`.

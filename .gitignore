@@ -14,8 +14,7 @@ logs/
 hs_err_*.log
 replay_pid*
 
-# ---- Datagen (arquivos gerados; remova esta linha se quiser versionar) ----
-# src/main/generated/
+# ---- Datagen: src/main/generated é versionado, só o cache de hashes fica de fora ----
 .cache/
 
 # ---- Artefatos de build / releases ----
