@@ -1,5 +1,7 @@
 package com.otavi.mobmod.client.datagen;
 
+import com.otavi.mobmod.core.ModEntityTypes;
+import com.otavi.mobmod.core.ModItems;
 import com.otavi.mobmod.core.ModMobs;
 import com.otavi.mobmod.core.Translation;
 import com.otavi.mobmod.entity.genetics.Sex;
@@ -25,6 +27,12 @@ public class ModLanguageProvider extends FabricLanguageProvider {
         builder.add(SkinVariant.NORMAL.translationKey(), new Translation("Normal", "Normal").get(this.locale));
         builder.add(SkinVariant.ALBINO.translationKey(), new Translation("Albino", "Albino").get(this.locale));
         builder.add(SkinVariant.MELANISTIC.translationKey(), new Translation("Melanistic", "Melânico").get(this.locale));
+
+        for (var item : ModItems.ALL) {
+            builder.add(item.item(), item.name().get(this.locale));
+        }
+        // The thrown projectile shows up in death messages
+        builder.add(ModEntityTypes.COCONUT, new Translation("Coconut", "Coco").get(this.locale));
 
         for (var mob : ModMobs.ALL) {
             var name = mob.displayName().get(this.locale);

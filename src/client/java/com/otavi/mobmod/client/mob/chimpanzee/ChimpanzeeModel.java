@@ -149,6 +149,14 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
             this.head.xRot -= call * 0.5F;
         }
 
+        // Throw: the right arm goes back over the shoulder and whips forward, mouth open with excitement
+        if (state.throwProgress > 0.0F) {
+            float t = 1.0F - state.throwProgress;
+            this.rightArm.xRot = t < 0.4F ? -3.0F * (t / 0.4F) : -3.0F + 3.4F * ((t - 0.4F) / 0.6F);
+            this.rightArm.zRot = 0.2F;
+            this.jaw.xRot = Math.max(this.jaw.xRot, Mth.sin(state.throwProgress * Mth.PI) * 0.4F);
+        }
+
         // Attack: rear up and swing both arms down onto the target, mouth open
         if (state.attackProgress > 0.0F) {
             float lift = Mth.sin(state.attackProgress * Mth.PI);

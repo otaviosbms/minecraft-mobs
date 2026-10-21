@@ -1,7 +1,9 @@
 {
   "entity.mobmod.chimpanzee": "Chimpanzé",
+  "entity.mobmod.coconut": "Coco",
   "entity.mobmod.elephant": "Elefante",
   "item.mobmod.chimpanzee_spawn_egg": "Ovo Gerador de Chimpanzé",
+  "item.mobmod.coconut": "Coco",
   "item.mobmod.elephant_spawn_egg": "Ovo Gerador de Elefante",
   "mobmod.sex.female": "Fêmea",
   "mobmod.sex.male": "Macho",

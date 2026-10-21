@@ -12,14 +12,17 @@
 
 ![Variantes do chimpanzé](../imagens/chimpanze-variantes.png)
 
-Um primata neutro das selvas, em tamanho real (cerca de 1 bloco de altura andando de quatro). Vive em bandos, anda apoiado nos nós dos dedos e escala paredes e troncos como uma aranha, sem cair sem querer da copa das árvores. Quando um membro do bando é atacado, os outros defendem.
+Um primata neutro das selvas, em tamanho real (cerca de 1 bloco de altura andando de quatro). Vive em bandos, anda apoiado nos nós dos dedos, sobe com frequência nas árvores para passar um tempo na copa (sem cair sem querer) e, de vez em quando, joga um coco em quem estiver por perto. Quando um membro do bando é atacado, os outros defendem.
 
 ## Arquivos
 
 | O quê | Onde |
 |---|---|
 | Definição (tamanho, spawn, comida, nome) | [`mob/chimpanzee/ChimpanzeeMob.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/ChimpanzeeMob.java) |
-| Entidade (atributos, IA, escalada, ataque, sons) | [`mob/chimpanzee/Chimpanzee.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/Chimpanzee.java) |
+| Entidade (atributos, IA, escalada, árvores, coco, ataque, sons) | [`mob/chimpanzee/Chimpanzee.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/Chimpanzee.java) |
+| Subir e descer de árvores | [`ClimbTreeGoal.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/ClimbTreeGoal.java), [`ClimbDownTreeGoal.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/ClimbDownTreeGoal.java) |
+| Arremesso de coco | [`ThrowCoconutGoal.java`](../../src/main/java/com/otavi/mobmod/mob/chimpanzee/ThrowCoconutGoal.java) |
+| Item e projétil do coco | [`item/coconut/`](../../src/main/java/com/otavi/mobmod/item/coconut/) |
 | Modelo e animações | [`client/mob/chimpanzee/ChimpanzeeModel.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeModel.java) |
 | Renderer e render state | [`ChimpanzeeRenderer.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeRenderer.java), [`ChimpanzeeRenderState.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeRenderState.java) |
 | Registro cliente | [`ChimpanzeeClient.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeClient.java) |
@@ -63,6 +66,9 @@ Escala da vida real: um chimpanzé andando de quatro tem cerca de 1 m até o top
 | 2 | `BreedGoal` | Procura parceiro quando está em love mode (1.0×) |
 | 3 | `TemptGoal` | Segue o jogador segurando comida da tag `mobmod:chimpanzee_food` (1.2×). Não se assusta com movimentos bruscos |
 | 4 | `FollowParentGoal` | Filhotes seguem um adulto (1.2×) |
+| 4 | `ClimbDownTreeGoal` | Na copa, quando o tempo lá em cima acaba, desce pelo tronco até o chão |
+| 4 | `ThrowCoconutGoal` | Chance baixa de jogar um coco num jogador próximo (veja abaixo) |
+| 4 | `ClimbTreeGoal` | Com frequência, vai até uma árvore próxima e sobe até a copa (veja abaixo) |
 | 5 | `WaterAvoidingRandomStrollGoal` | Passeia evitando a água (1.0×) |
 | 6 | `LookAtPlayerGoal` | Olha para jogadores a até 8 blocos |
 | 7 | `RandomLookAroundGoal` | Olha ao redor quando está parado |
@@ -85,7 +91,35 @@ Igual à da aranha:
 - quando encosta numa parede, fica "escalável" (`onClimbable`) e sobe por ela;
 - o estado de escalada é sincronizado com o cliente, que anima os braços estendidos para cima.
 
-Na selva, isso deixa o chimpanzé subir nas árvores e nos troncos grossos.
+Isso vale para qualquer parede. Para as árvores existe um comportamento próprio, descrito a seguir.
+
+### Subir em árvores
+
+Os chimpanzés sobem nas árvores com frequência e passam um tempo na copa:
+
+| Etapa | Como funciona |
+|---|---|
+| Escolher a árvore | Em média a cada **10 s** no chão (`ClimbTreeGoal.CHANCE = 200` ticks), procura o tronco mais próximo num raio de 10 blocos. Precisa de uma coluna livre ao lado da base do tronco que leve a uma copa com pelo menos 4 blocos de altura |
+| Ir até o tronco | Caminha até o lado da base do tronco |
+| Subir | Agarra o tronco e sobe por ele (0,12 bloco/tick, cerca de 2,4 blocos/s), **atravessando a folhagem**, até sair em cima da copa. Enquanto sobe não tem colisão nem gravidade, então as folhas não o bloqueiam e ele não cai; a animação de escalada fica ligada. Essa etapa não é interrompida |
+| Ficar na copa | Fica lá em cima de **30 a 90 s**: passeia pela copa (a segurança contra quedas não deixa cair), olha ao redor e pode jogar cocos |
+| Descer | Quando o tempo acaba (`ClimbDownTreeGoal`), procura o tronco mais próximo (até 3 blocos) e desce ao lado dele, de novo atravessando a folhagem (0,15 bloco/tick), até o chão de verdade. Sem tronco perto, desce reto pela própria coluna. Não toma dano de queda |
+
+Ele conta como "na árvore" quando está sobre folhas ou troncos com o chão de verdade a 3 blocos ou mais abaixo. Filhotes também sobem. Se for provocado na copa, o ataque tem prioridade e ele pode pular para perseguir o alvo.
+
+### Arremesso de coco
+
+De vez em quando, um chimpanzé adulto joga um [coco](#coco) num jogador:
+
+| | |
+|---|---|
+| Chance | Em média uma vez a cada **30 s** enquanto há um jogador a até 12 blocos, à vista (`ThrowCoconutGoal.CHANCE = 600` ticks) |
+| Recarga | Depois de jogar, o mesmo chimpanzé espera **60 a 120 s** para jogar de novo |
+| Quando não joga | Filhote, apaixonado, lutando, escalando um tronco, ou jogador no modo espectador |
+| Como joga | Para, encara o jogador por 0,75 s e arremessa com um pequeno arco, como um golem de neve. Toca o som da bola de neve e anima o braço direito (evento de entidade `6`) |
+| Efeito | O mesmo da bola de neve: empurra, mas não causa dano |
+
+Também funciona da copa das árvores.
 
 ### Segurança contra quedas
 
@@ -147,7 +181,11 @@ Sexo e variante são salvos no NBT (`Sex`, `SkinVariant`) e aparecem na barra de
 
 ## Drops
 
-Nenhum item: o chimpanzé não tem loot table (`loot` não é definido em `ChimpanzeeMob`). Solta só a XP padrão de animal ao ser morto por um jogador.
+| Item | Quantidade | Pilhagem (Looting) |
+|---|---|---|
+| Coco | 0 a 1 | +0 a 1 por nível |
+
+Tabela gerada: `data/mobmod/loot_table/entities/chimpanzee.json`. Também solta a XP padrão de animal ao ser morto por um jogador. É a forma de o jogador conseguir cocos fora do modo criativo.
 
 ## Sons
 
@@ -203,6 +241,7 @@ Todas procedurais, calculadas em `ChimpanzeeModel.setupAnim`:
 | Orelhas | Mexem rapidamente de vez em quando, cada uma no seu ritmo |
 | Chamado | Toda vez que toca o som ambiente, levanta a cabeça e abre a boca (1 s). O servidor avisa o cliente pelo evento de entidade `5` |
 | Escalada | O corpo fica mais vertical contra a parede, os braços se alternam esticados para cima, cada perna empurra junto com o braço oposto, e a cabeça olha para cima |
+| Arremesso | O braço direito vai para trás do ombro e desce rápido para a frente, com a boca entreaberta (0,5 s) |
 | Ataque | Levanta os dois braços e bate para baixo, com a cabeça para trás e a boca aberta (0,5 s) |
 
 Os deslocamentos (respiração e passos) são multiplicados pela escala da camada, para o filhote balançar na mesma proporção do adulto.
@@ -215,6 +254,20 @@ Os deslocamentos (respiração e passos) são multiplicados pela escala da camad
 | Aba criativa | Spawn Eggs, logo depois do ovo de Galinha |
 | Textura do ovo | `textures/item/chimpanzee_spawn_egg.png` (marrom-escuro com manchas claras, gerada pelo mesmo gerador) |
 
+### Coco
+
+| | |
+|---|---|
+| ID | `mobmod:coconut` ("Coconut" / "Coco") |
+| Uso | Clique direito arremessa, exatamente como a bola de neve: mesmo som, força 1.5, mesma imprecisão, um item por arremesso |
+| Efeito | Igual à bola de neve: empurra o alvo, **sem dano** (`ThrownCoconut.DAMAGE = 0`), e quebra em partículas ao bater |
+| Pilha | 16 |
+| Dispenser | Atira cocos como atira bolas de neve |
+| Aba criativa | Combate, logo depois da bola de neve |
+| Como conseguir | Drop do chimpanzé (0 a 1) |
+| Textura | `textures/item/coconut.png`, gerada por `tools/textures/CoconutTexture.java` |
+| Projétil | `mobmod:coconut` (`ThrownCoconut`), desenhado como o item, como a bola de neve |
+
 ## Traduções
 
 | Chave | en_us | pt_br |
@@ -222,6 +275,8 @@ Os deslocamentos (respiração e passos) são multiplicados pela escala da camad
 | `entity.mobmod.chimpanzee` | Chimpanzee | Chimpanzé |
 | `item.mobmod.chimpanzee_spawn_egg` | Chimpanzee Spawn Egg | Ovo Gerador de Chimpanzé |
 | `tag.item.mobmod.chimpanzee_food` | Food for Chimpanzees | Comida para Chimpanzés |
+| `item.mobmod.coconut` | Coconut | Coco |
+| `entity.mobmod.coconut` | Coconut | Coco |
 
 ## Comandos úteis
 
@@ -240,8 +295,16 @@ Coberto pelos gametests genéricos (`./gradlew runGameTestServer`), que percorre
 - nasce e sobrevive;
 - macho maior que fêmea;
 - só macho + fêmea acasalam;
-- dois pais albinos nunca têm filhote normal.
+- dois pais albinos nunca têm filhote normal;
+- tem loot table (o coco).
 
-O teste de loot table não se aplica, porque o chimpanzé não tem drops.
+Testes específicos:
 
-Teste específico, `chimpanzeeDoesNotWalkOffHighLedges`: põe o chimpanzé sobre um bloco a 5 de altura, tenta movê-lo 2 blocos para fora e confirma que ele continua lá em cima.
+| Teste | O que verifica |
+|---|---|
+| `chimpanzeeDoesNotWalkOffHighLedges` | Sobre um bloco a 5 de altura, tenta movê-lo 2 blocos para fora e confirma que ele continua lá em cima |
+| `chimpanzeeClimbsUpAndDownTrees` | Monta uma árvore (tronco de 5 e copa de 2 camadas), pede uma subida e confirma que ele chega em cima da copa |
+| `chimpanzeeClimbsDownWhenItsStayEnds` | Põe o chimpanzé na copa com o tempo esgotado e confirma que ele desce até o chão sem tomar dano |
+| `chimpanzeeThrowsCoconutsAtPlayers` | Arremessa um coco num alvo e confirma que o projétil aparece |
+
+Para os testes, `requestTreeClimb()`, `endTreeStay()` e `requestCoconutThrow()` pulam o sorteio de chance.

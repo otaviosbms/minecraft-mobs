@@ -37,6 +37,9 @@ minecraft-mobs/
 | `core/SpawnRule.java` | Onde e como o mob nasce (biomas, peso, grupo, placement). `SpawnRule.animal(...)` cobre animais terrestres |
 | `core/Translation.java` | Texto em todos os idiomas do mod (`en_us`, `pt_br`) |
 | `core/MobLoot.java` | Função que monta a loot table do mob (usada só pelo datagen) |
+| `core/ModItems.java` | Itens que não são ovos (ex.: coco), com nome, aba criativa e modelo gerados pelo datagen |
+| `core/ModEntityTypes.java` | Entidades que não são mobs (ex.: o projétil do coco) |
+| `item/<nome>/` | Um pacote por item com comportamento próprio (ex.: `item/coconut/`: item e projétil) |
 | `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais, com reprodução macho + fêmea). Veja [genetica.md](genetica.md) |
 | `entity/goal/` | Goals de IA reaproveitáveis por vários mobs (`AdultMeleeAttackGoal`, `BabyPanicGoal`) |
 | `mob/<nome>/` | Um pacote por mob: a classe da entidade e o `<Nome>Mob` com a `MobDefinition` |
@@ -62,10 +65,10 @@ Separado por `splitEnvironmentSourceSets()` para que código de cliente nunca va
 
 | Provider | Gera | A partir de |
 |---|---|---|
-| `ModLanguageProvider` | `assets/mobmod/lang/en_us.json`, `pt_br.json` | nome do mob, nome do ovo (automático), nome da tag de comida |
+| `ModLanguageProvider` | `assets/mobmod/lang/en_us.json`, `pt_br.json` | nome do mob, nome do ovo (automático), nome da tag de comida, nomes dos itens de `ModItems` |
 | `ModEntityLootProvider` | `data/mobmod/loot_table/entities/<mob>.json` | `MobDefinition.loot(...)` |
 | `ModItemTagProvider` | `data/mobmod/tags/item/<mob>_food.json` | `MobDefinition.food(...)` |
-| `ModModelProvider` | `assets/mobmod/items/` e `models/item/` dos ovos | ovo de cada mob |
+| `ModModelProvider` | `assets/mobmod/items/` e `models/item/` dos ovos e dos itens | ovo de cada mob e `ModItems.ALL` |
 
 A pasta `generated` é **versionada** (só o `.cache/` é ignorado), então o projeto compila sem rodar o datagen. Mesmo assim, **rode `runDatagen` sempre que mudar uma `MobDefinition`** e commite o resultado. Arquivos de mobs removidos são apagados automaticamente.
 
@@ -103,6 +106,7 @@ As texturas são geradas por código em `tools/textures/`, todas no mesmo estilo
 | `MobTexture.java` | Base comum: ruído em duas camadas, estrias, rugas em espiral, faces de cima mais claras e de baixo mais escuras, uma paleta por variante e o ovo de spawn |
 | `ElephantTexture.java` | Elefante (256×256) |
 | `ChimpanzeeTexture.java` | Chimpanzé (256×256, modelo em detalhe dobrado) e o ovo dele |
+| `CoconutTexture.java` | Item coco (16×16) |
 
 Cada gerador documenta no topo o layout UV do modelo e grava `<mob>.png`, `<mob>_albino.png` e `<mob>_melanistic.png` com o mesmo desenho e paletas diferentes. Rode da raiz do projeto, passando a pasta de texturas:
 

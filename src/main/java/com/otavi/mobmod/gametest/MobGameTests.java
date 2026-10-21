@@ -7,8 +7,11 @@ import com.otavi.mobmod.entity.genetics.SkinVariant;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
+import com.otavi.mobmod.core.ModEntityTypes;
 import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -114,6 +117,61 @@ public class MobGameTests {
                 helper.succeed();
             });
         });
+    }
+
+    @GameTest(maxTicks = 600)
+    public void chimpanzeeClimbsUpAndDownTrees(GameTestHelper helper) {
+        // A small tree: a trunk 5 logs high with two layers of leaves around its top
+        for (int y = 0; y < 5; y++) {
+            helper.setBlock(new BlockPos(5, y, 5), Blocks.JUNGLE_LOG);
+        }
+        for (int x = 4; x <= 6; x++) {
+            for (int z = 4; z <= 6; z++) {
+                for (int y = 4; y <= 5; y++) {
+                    if (x != 5 || z != 5 || y == 5) {
+                        helper.setBlock(new BlockPos(x, y, z), Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true));
+                    }
+                }
+            }
+        }
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(1, 0, 5));
+        double groundY = chimpanzee.getY();
+        chimpanzee.requestTreeClimb();
+        helper.succeedWhen(() -> {
+            if (chimpanzee.getY() < groundY + 5.5) {
+                // Still on its way up: keep waiting
+                helper.assertTrue(false, "chimpanzee did not reach the canopy");
+            }
+            helper.assertTrue(chimpanzee.isInTree(), "chimpanzee is up but not standing on the canopy");
+        });
+    }
+
+    @GameTest(maxTicks = 400)
+    public void chimpanzeeClimbsDownWhenItsStayEnds(GameTestHelper helper) {
+        for (int y = 0; y < 5; y++) {
+            helper.setBlock(new BlockPos(5, y, 5), Blocks.JUNGLE_LOG);
+        }
+        for (int x = 4; x <= 6; x++) {
+            for (int z = 4; z <= 6; z++) {
+                helper.setBlock(new BlockPos(x, 5, z), Blocks.JUNGLE_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true));
+            }
+        }
+        // On top of the canopy, with its stay already over
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(4, 6, 5));
+        chimpanzee.endTreeStay();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(chimpanzee.onGround() && chimpanzee.getY() < helper.absoluteVec(Vec3.ZERO).y + 1.0, "chimpanzee is still up the tree");
+            helper.assertTrue(chimpanzee.getHealth() == chimpanzee.getMaxHealth(), "chimpanzee got hurt climbing down");
+        });
+    }
+
+    @GameTest
+    public void chimpanzeeThrowsCoconutsAtPlayers(GameTestHelper helper) {
+        var chimpanzee = helper.spawn(ChimpanzeeMob.TYPE, new BlockPos(1, 0, 1));
+        var target = helper.spawn(EntityTypes.PIG, new BlockPos(6, 0, 6));
+        chimpanzee.throwCoconutAt(target);
+        helper.assertEntityPresent(ModEntityTypes.COCONUT);
+        helper.succeed();
     }
 
     /**

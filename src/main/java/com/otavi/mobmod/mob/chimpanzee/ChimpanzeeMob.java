@@ -2,6 +2,7 @@ package com.otavi.mobmod.mob.chimpanzee;
 
 import com.otavi.mobmod.MobMod;
 import com.otavi.mobmod.core.MobDefinition;
+import com.otavi.mobmod.core.ModItems;
 import com.otavi.mobmod.core.SpawnRule;
 import com.otavi.mobmod.core.Translation;
 import net.minecraft.core.registries.Registries;
@@ -11,6 +12,13 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.EnchantedCountIncreaseFunction;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 public final class ChimpanzeeMob {
     public static final TagKey<Item> FOOD = TagKey.create(Registries.ITEM, MobMod.id("chimpanzee_food"));
@@ -23,6 +31,13 @@ public final class ChimpanzeeMob {
             .name("Chimpanzee", "Chimpanzé")
             .food(FOOD, new Translation("Food for Chimpanzees", "Comida para Chimpanzés"),
                     Items.APPLE, Items.MELON_SLICE, Items.SWEET_BERRIES, Items.GLOW_BERRIES, Items.COCOA_BEANS)
+            // Sometimes drops the coconut it was carrying
+            .loot(context -> LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ContextIntProviders.exactly(1))
+                            .add(LootItem.lootTableItem(ModItems.COCONUT)
+                                    .apply(SetItemCountFunction.setCount(ContextIntProviders.between(0, 1)))
+                                    .apply(EnchantedCountIncreaseFunction.lootingMultiplier(context.enchantments(), ContextFloatProviders.between(0.0F, 1.0F))))))
             .spawnEggAfter(Items.CHICKEN_SPAWN_EGG)
             .build();
 

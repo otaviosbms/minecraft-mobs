@@ -1,5 +1,7 @@
 package com.otavi.mobmod;
 
+import com.otavi.mobmod.core.ModEntityTypes;
+import com.otavi.mobmod.core.ModItems;
 import com.otavi.mobmod.core.ModMobs;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
@@ -9,6 +11,8 @@ public class MobMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ModEntityTypes.init();
+        ModItems.init();
         ModMobs.init();
     }
 

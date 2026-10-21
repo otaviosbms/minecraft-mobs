@@ -11,5 +11,9 @@ public class ChimpanzeeRenderState extends ModMobRenderState {
      * Goes from 1 (call just started) to 0 (call finished).
      */
     public float hootProgress;
+    /**
+     * Goes from 1 (throw just started) to 0 (arm back down).
+     */
+    public float throwProgress;
     public boolean climbing;
 }

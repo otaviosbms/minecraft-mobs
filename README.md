@@ -30,7 +30,9 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 - **Atributos:** 24 de vida, 4 de dano, velocidade 0.3.
 - **Spawn:** biomas de selva.
 - **Reprodução:** maçã, fatia de melancia, bagas doces, bagas brilhantes e sementes de cacau. Só um macho e uma fêmea geram filhotes.
-- **Drops:** nenhum item.
+- **Árvores:** sobe com frequência nas árvores, atravessando a folhagem pelo tronco, fica de 30 a 90 s na copa e depois desce sem se machucar.
+- **Coco:** chance baixa de jogar um coco num jogador próximo. O coco funciona como a bola de neve (empurra, sem dano) e o jogador também pode arremessá-lo.
+- **Drops:** 0 a 1 coco.
 
 Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chimpanze.md).
 
