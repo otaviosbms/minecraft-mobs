@@ -1,4 +1,4 @@
-# Mob Mod
+# Minecraft Mobs
 
 Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefante**, um animal neutro das savanas.
 
