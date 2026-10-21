@@ -40,7 +40,7 @@ minecraft-mobs/
 | `core/ModItems.java` | Itens que não são ovos (ex.: fezes), com nome, aba criativa e modelo gerados pelo datagen |
 | `core/ModEntityTypes.java` | Entidades que não são mobs (ex.: o projétil das fezes) |
 | `item/<nome>/` | Um pacote por item com comportamento próprio (ex.: `item/feces/`: item e projétil) |
-| `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais, com reprodução macho + fêmea). Veja [genetica.md](genetica.md) |
+| `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais, com reprodução macho + fêmea e regeneração de vida). Veja [genetica.md](genetica.md) e [regeneracao.md](regeneracao.md) |
 | `entity/goal/` | Goals de IA reaproveitáveis por vários mobs (`AdultMeleeAttackGoal`, `BabyPanicGoal`) |
 | `mob/<nome>/` | Um pacote por mob: a classe da entidade e o `<Nome>Mob` com a `MobDefinition` |
 | `gametest/MobGameTests.java` | Testes que percorrem `ModMobs.ALL`: spawn, loot table, tamanho do macho, acasalamento só entre sexos opostos e herança de variante |

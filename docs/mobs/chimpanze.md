@@ -154,6 +154,16 @@ Usa o sistema global de [genética](../projeto/genetica.md):
 | Filhote | Sexo 50/50 e variante herdada de um dos pais (1% de mutação para cada variante rara) |
 | Crescimento | Igual aos animais vanilla. A comida acelera o crescimento do filhote |
 
+## Regeneração
+
+Usa o sistema global de [regeneração](../projeto/regeneracao.md):
+
+| | |
+|---|---|
+| Por tempo | 0,2 por segundo, vida cheia em 2 min |
+| Começa | 10 s depois do último dano, e só fora de combate (sem alvo) |
+| Comida | Cada item da comida cura 2,4 de vida, sem entrar em love mode (com a vida cheia, serve para reproduzir) |
+
 ## Sexo e variantes
 
 | | Fêmea | Macho |

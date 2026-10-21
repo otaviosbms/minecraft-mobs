@@ -69,6 +69,16 @@ Descrição curta do mob e do seu papel no jogo.
 | Quem pode acasalar | Somente macho + fêmea |
 | Filhote | Sexo 50/50, variante herdada |
 
+## Regeneração
+
+Usa o sistema global de [regeneração](../projeto/regeneracao.md). Preencha com os valores do mob (vida máxima / 120 por segundo, a não ser que o mob sobrescreva `regenFullHealthSeconds()`):
+
+| | |
+|---|---|
+| Por tempo | |
+| Começa | 10 s depois do último dano, e só fora de combate (sem alvo) |
+| Comida | Cada item da comida cura 10% da vida |
+
 ## Sexo e variantes
 
 | | Fêmea | Macho |

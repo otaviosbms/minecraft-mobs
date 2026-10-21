@@ -98,6 +98,16 @@ Usa o sistema global de [genética](../projeto/genetica.md):
 
 A mesma comida atrai o elefante (`TemptGoal`) e é usada em `isFood`.
 
+## Regeneração
+
+Usa o sistema global de [regeneração](../projeto/regeneracao.md):
+
+| | |
+|---|---|
+| Por tempo | 0,5 por segundo, vida cheia em 2 min |
+| Começa | 10 s depois do último dano, e só fora de combate (sem alvo) |
+| Comida | Cada item da comida cura 6 de vida (3 corações), sem entrar em love mode (com a vida cheia, serve para reproduzir) |
+
 ## Sexo e variantes
 
 | | Fêmea | Macho |

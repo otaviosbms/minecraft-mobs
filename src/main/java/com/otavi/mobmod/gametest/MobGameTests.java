@@ -1,21 +1,24 @@
 package com.otavi.mobmod.gametest;
 
+import com.otavi.mobmod.core.ModEntityTypes;
 import com.otavi.mobmod.core.ModMobs;
 import com.otavi.mobmod.entity.genetics.ModAnimal;
 import com.otavi.mobmod.entity.genetics.Sex;
 import com.otavi.mobmod.entity.genetics.SkinVariant;
+import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
-import com.otavi.mobmod.core.ModEntityTypes;
-import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +100,78 @@ public class MobGameTests {
                 var calf = (ModAnimal) father.getBreedOffspring(helper.getLevel(), mother);
                 helper.assertTrue(calf != null && calf.getSkinVariant() != SkinVariant.NORMAL, father.getType().toShortString() + " calf lost its parents' variant");
             }
+        }
+        helper.succeed();
+    }
+
+    @GameTest(maxTicks = 100)
+    public void injuredMobsRegenerateOutOfCombat(GameTestHelper helper) {
+        var injured = new ArrayList<ModAnimal>();
+        for (var animal : spawnAnimals(helper)) {
+            var mob = animal[0];
+            animal[1].discard();
+            mob.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), mob.getMaxHealth() / 2);
+            // Skip the delay after the damage
+            mob.setTicksSinceDamage(Integer.MAX_VALUE / 2);
+            injured.add(mob);
+        }
+        float[] before = new float[injured.size()];
+        for (int i = 0; i < injured.size(); i++) {
+            before[i] = injured.get(i).getHealth();
+        }
+        // Three regeneration steps (one per second)
+        helper.runAfterDelay(65, () -> {
+            for (int i = 0; i < injured.size(); i++) {
+                var mob = injured.get(i);
+                float expected = mob.getMaxHealth() / 120.0F * 3.0F;
+                helper.assertTrue(mob.getHealth() - before[i] >= expected * 0.99F,
+                        mob.getType().toShortString() + " regenerated " + (mob.getHealth() - before[i]) + " instead of " + expected);
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest(maxTicks = 100)
+    public void mobsDoNotRegenerateRightAfterDamage(GameTestHelper helper) {
+        var injured = new ArrayList<ModAnimal>();
+        for (var animal : spawnAnimals(helper)) {
+            animal[1].discard();
+            animal[0].hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), animal[0].getMaxHealth() / 2);
+            injured.add(animal[0]);
+        }
+        float[] before = new float[injured.size()];
+        for (int i = 0; i < injured.size(); i++) {
+            before[i] = injured.get(i).getHealth();
+        }
+        // 3 s later: still inside the 10 s delay
+        helper.runAfterDelay(60, () -> {
+            for (int i = 0; i < injured.size(); i++) {
+                helper.assertTrue(injured.get(i).getHealth() == before[i], injured.get(i).getType().toShortString() + " regenerated right after being hurt");
+            }
+            helper.succeed();
+        });
+    }
+
+    @GameTest
+    public void foodHealsInjuredMobs(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        for (var definition : ModMobs.ALL) {
+            if (definition.food() == null || definition.food().items().isEmpty()) {
+                continue;
+            }
+            var mob = helper.spawn(definition.type(), new BlockPos(1, 0, 1));
+            if (!(mob instanceof ModAnimal animal)) {
+                continue;
+            }
+            animal.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), animal.getMaxHealth() / 2);
+            float before = animal.getHealth();
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(definition.food().items().getFirst(), 2));
+            animal.mobInteract(player, InteractionHand.MAIN_HAND);
+            float expected = animal.getMaxHealth() * 0.1F;
+            helper.assertTrue(Math.abs(animal.getHealth() - before - expected) < 0.01F,
+                    definition.name() + " healed " + (animal.getHealth() - before) + " instead of " + expected);
+            helper.assertTrue(!animal.isInLove(), definition.name() + " fell in love instead of just eating");
+            helper.assertTrue(player.getMainHandItem().getCount() == 1, definition.name() + " did not eat exactly one item");
         }
         helper.succeed();
     }

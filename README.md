@@ -41,6 +41,7 @@ Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chi
 - **Sexo:** macho ou fêmea, com reprodução igual à vanilla, mas só entre sexos opostos.
 - **Variantes de pele:** albino e melânico (1% cada), herdadas dos pais.
 - **Barra de informações:** nome, sexo (♂/♀) e vida acima do mob, no estilo Mo'Creatures.
+- **Regeneração:** fora de combate, a vida volta sozinha (cheia em 2 minutos, começando 10 s depois do último dano). Dar a comida a um mob ferido cura 10% da vida.
 
 ![Variantes do elefante](docs/imagens/elefante-variantes.png)
 ![Variantes do chimpanzé](docs/imagens/chimpanze-variantes.png)
@@ -89,6 +90,7 @@ Adicionar um mob é criar as duas pastas dele, colocar uma linha em `ModMobs` e 
 - [Visão geral do projeto](docs/projeto/visao-geral.md)
 - [Como adicionar um mob](docs/projeto/como-adicionar-um-mob.md)
 - [Genética: sexo, reprodução e variantes](docs/projeto/genetica.md)
+- [Regeneração de vida](docs/projeto/regeneracao.md)
 - [Fichas dos mobs](docs/mobs/README.md)
 - [Análise dos mobs do Promenade](docs/analises/analise-mobs-promenade.md) (referência usada na criação do mod)
 
