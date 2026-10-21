@@ -30,7 +30,7 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 
 ![Variantes do elefante](docs/imagens/elefante-variantes.png)
 
-Detalhes em [genetica.md](docs/projeto/genetica.md).
+Detalhes em [genetica.md](docs/projeto/genetica.md). Cada mob tem sua ficha completa em [docs/mobs](docs/mobs/README.md).
 
 ## Como usar
 
@@ -74,6 +74,7 @@ Adicionar um mob é criar as duas pastas dele, colocar uma linha em `ModMobs` e 
 - [Visão geral do projeto](docs/projeto/visao-geral.md)
 - [Como adicionar um mob](docs/projeto/como-adicionar-um-mob.md)
 - [Genética: sexo, reprodução e variantes](docs/projeto/genetica.md)
+- [Fichas dos mobs](docs/mobs/README.md)
 - [Análise dos mobs do Promenade](docs/analises/analise-mobs-promenade.md) (referência usada na criação do mod)
 
 ## Licença

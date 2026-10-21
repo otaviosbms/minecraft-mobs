@@ -76,3 +76,7 @@ Os testes já cobrem o mob novo: ele precisa nascer, sobreviver e ter loot table
 Teste no jogo com `/summon mobmod:zebra` e o ovo na aba Spawn Eggs.
 
 Commite também os arquivos gerados em `src/main/generated`.
+
+## 6. Documentar
+
+Copie [`docs/mobs/_modelo.md`](../mobs/_modelo.md) para `docs/mobs/<nome>.md`, preencha com os valores reais e adicione uma linha no [índice dos mobs](../mobs/README.md).

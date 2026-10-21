@@ -1,0 +1,11 @@
+# Mobs
+
+Ficha completa de cada mob do mod: atributos, IA, reprodução, variantes, spawn, drops, sons, modelo, animações e traduções.
+
+| Mob | ID | Temperamento | Biomas | Vida | Tamanho (fêmea) |
+|---|---|---|---|---|---|
+| [Elefante](elefante.md) | `mobmod:elephant` | Neutro | Savanas | 60 | 2.6 × 3.0 |
+
+Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md).
+
+Para documentar um mob novo, copie o [modelo](_modelo.md).

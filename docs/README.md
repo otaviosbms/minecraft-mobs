@@ -5,6 +5,7 @@
 | Pasta | Conteúdo |
 |---|---|
 | [`projeto/`](projeto/) | Documentação do próprio mod: estrutura, build, arquitetura |
+| [`mobs/`](mobs/) | Ficha completa de cada mob (atributos, IA, spawn, drops, modelo...) |
 | [`analises/`](analises/) | Análises técnicas de código de referência (ex.: Promenade) |
 | [`prompts/`](prompts/) | Prompts usados para guiar o trabalho com IA |
 | [`imagens/`](imagens/) | Imagens usadas na documentação |
@@ -13,6 +14,7 @@
 
 - [projeto/visao-geral.md](projeto/visao-geral.md) — arquitetura, estrutura de pastas, datagen e build
 - [projeto/como-adicionar-um-mob.md](projeto/como-adicionar-um-mob.md) — passo a passo para criar um mob novo
+- [mobs/README.md](mobs/README.md) — índice dos mobs, com uma ficha por mob ([Elefante](mobs/elefante.md))
 - [projeto/genetica.md](projeto/genetica.md) — sexo, reprodução, variantes de pele e barra de informações
 - [analises/analise-mobs-promenade.md](analises/analise-mobs-promenade.md) — análise técnica dos mobs do mod Promenade (referência)
 - [prompts/prompt-analise-mobs-promenade.md](prompts/prompt-analise-mobs-promenade.md) — prompt de análise do Promenade + criação de mob personalizado
