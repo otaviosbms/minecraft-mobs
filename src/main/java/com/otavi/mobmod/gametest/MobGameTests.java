@@ -6,6 +6,8 @@ import com.otavi.mobmod.entity.genetics.ModAnimal;
 import com.otavi.mobmod.entity.genetics.Sex;
 import com.otavi.mobmod.entity.genetics.SkinVariant;
 import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
+import com.otavi.mobmod.mob.meerkat.Meerkat;
+import com.otavi.mobmod.mob.meerkat.MeerkatMob;
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -299,6 +301,83 @@ public class MobGameTests {
         chimpanzee.throwFecesAt(target);
         helper.assertEntityPresent(ModEntityTypes.FECES);
         helper.succeed();
+    }
+
+    @GameTest(maxTicks = 100)
+    public void meerkatStandsUpToKeepWatch(GameTestHelper helper) {
+        var meerkat = helper.spawn(MeerkatMob.TYPE, new BlockPos(1, 0, 1));
+        meerkat.requestWatch();
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(meerkat.isStanding(), "meerkat should be standing up on watch");
+            helper.assertTrue(meerkat.getStandAmount(1.0F) == 1.0F, "meerkat should be fully up after a second");
+            // Getting hurt drops it back on all fours to fight
+            meerkat.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 1.0F);
+            meerkat.setLastHurtByMob(helper.spawn(EntityTypes.PIG, new BlockPos(3, 0, 3)));
+            helper.runAfterDelay(10, () -> {
+                helper.assertFalse(meerkat.isStanding(), "a hurt meerkat should stop keeping watch");
+                helper.succeed();
+            });
+        });
+    }
+
+    @GameTest(maxTicks = 100)
+    public void meerkatsHuntSilverfish(GameTestHelper helper) {
+        var meerkat = helper.spawn(MeerkatMob.TYPE, new BlockPos(1, 0, 1));
+        var silverfish = helper.spawn(EntityTypes.SILVERFISH, new BlockPos(4, 0, 4));
+        helper.succeedWhen(() -> helper.assertTrue(meerkat.getTarget() == silverfish, "meerkat is not hunting the silverfish"));
+    }
+
+    @GameTest(maxTicks = 200)
+    public void meerkatDigsInAndComesBackOut(GameTestHelper helper) {
+        sandFloor(helper);
+        var meerkat = helper.spawn(MeerkatMob.TYPE, new BlockPos(2, 1, 2));
+        helper.runAfterDelay(5, () -> {
+            helper.assertTrue(meerkat.burrow(Meerkat.HideReason.REST, 40), "meerkat could not dig into sand");
+            helper.runAfterDelay(Meerkat.DIG_LENGTH + 2, () -> {
+                helper.assertTrue(meerkat.isHidden(), "meerkat should be underground after digging");
+                helper.assertFalse(meerkat.isPickable(), "an underground meerkat should not be hittable");
+                float health = meerkat.getHealth();
+                meerkat.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 4.0F);
+                helper.assertTrue(meerkat.getHealth() == health, "an underground meerkat should not get hurt");
+                // Comes back up on its own once the rest is over
+                helper.succeedWhen(() -> helper.assertTrue(meerkat.getBurrowState() == Meerkat.BurrowState.SURFACE, "meerkat is still underground"));
+            });
+        });
+    }
+
+    @GameTest
+    public void meerkatCannotDigIntoStone(GameTestHelper helper) {
+        for (int x = 0; x < 5; x++) {
+            for (int z = 0; z < 5; z++) {
+                helper.setBlock(new BlockPos(x, 0, z), Blocks.STONE);
+            }
+        }
+        var meerkat = helper.spawn(MeerkatMob.TYPE, new BlockPos(2, 1, 2));
+        helper.runAfterDelay(5, () -> {
+            helper.assertFalse(meerkat.burrow(Meerkat.HideReason.REST, 40), "meerkat dug into stone");
+            helper.succeed();
+        });
+    }
+
+    @GameTest(maxTicks = 100)
+    public void meerkatsHideFromMonsters(GameTestHelper helper) {
+        sandFloor(helper);
+        var first = helper.spawn(MeerkatMob.TYPE, new BlockPos(1, 1, 1));
+        var second = helper.spawn(MeerkatMob.TYPE, new BlockPos(3, 1, 1));
+        var husk = helper.spawn(EntityTypes.HUSK, new BlockPos(2, 1, 4));
+        husk.setNoAi(true);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(first.isBurrowed(), "meerkat did not hide from the husk");
+            helper.assertTrue(second.isBurrowed(), "meerkat did not hide from the husk");
+        });
+    }
+
+    private static void sandFloor(GameTestHelper helper) {
+        for (int x = 0; x < 5; x++) {
+            for (int z = 0; z < 6; z++) {
+                helper.setBlock(new BlockPos(x, 0, z), Blocks.SAND);
+            }
+        }
     }
 
     /**

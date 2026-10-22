@@ -32,4 +32,12 @@ public record SpawnRule<T extends Mob>(
         return new SpawnRule<>(BiomeSelectors.tag(biomes), weight, minGroupSize, maxGroupSize,
                 SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules);
     }
+
+    /**
+     * Land animal with its own spawn check, e.g. one that spawns on sand instead of grass.
+     */
+    public static <T extends Animal> SpawnRule<T> animal(TagKey<Biome> biomes, int weight, int minGroupSize, int maxGroupSize, SpawnPlacements.SpawnPredicate<T> predicate) {
+        return new SpawnRule<>(BiomeSelectors.tag(biomes), weight, minGroupSize, maxGroupSize,
+                SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, predicate);
+    }
 }

@@ -1,6 +1,6 @@
 # Visão geral do projeto
 
-Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona dois mobs, cada um com ovo de spawn: o **Elefante** (`mobmod:elephant`) e o **Chimpanzé** (`mobmod:chimpanzee`). As fichas completas estão em [docs/mobs](../mobs/README.md). Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
+Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona três mobs, cada um com ovo de spawn: o **Elefante** (`mobmod:elephant`), o **Chimpanzé** (`mobmod:chimpanzee`) e o **Suricato** (`mobmod:meerkat`). As fichas completas estão em [docs/mobs](../mobs/README.md). Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
 
 A arquitetura foi pensada para **dezenas de mobs**: cada mob vive no seu próprio pacote e é declarado uma única vez numa `MobDefinition`; o resto (registro, spawn, aba criativa, traduções, loot, tags, modelos de item e testes) é derivado dessa definição. Para o passo a passo, veja [como-adicionar-um-mob.md](como-adicionar-um-mob.md).
 
@@ -105,7 +105,8 @@ As texturas são geradas por código em `tools/textures/`, todas no mesmo estilo
 |---|---|
 | `MobTexture.java` | Base comum: ruído em duas camadas, estrias, rugas em espiral, faces de cima mais claras e de baixo mais escuras, uma paleta por variante e o ovo de spawn |
 | `ElephantTexture.java` | Elefante (256×256) |
-| `ChimpanzeeTexture.java` | Chimpanzé (256×256, modelo em detalhe dobrado) e o ovo dele |
+| `ChimpanzeeTexture.java` | Chimpanzé (256×256, modelo em detalhe dobrado) |
+| `MeerkatTexture.java` | Suricato (128×128, modelo detalhado) e o ovo dele, desenhado como mapa de pixels |
 | `FecesTexture.java` | Item fezes (16×16) |
 
 Cada gerador documenta no topo o layout UV do modelo e grava `<mob>.png`, `<mob>_albino.png` e `<mob>_melanistic.png` com o mesmo desenho e paletas diferentes. Rode da raiz do projeto, passando a pasta de texturas:

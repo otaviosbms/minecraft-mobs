@@ -1,6 +1,6 @@
 # Minecraft Mobs
 
-Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefante**, das savanas, e o **Chimpanzé**, das selvas.
+Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefante**, das savanas, o **Chimpanzé**, das selvas, e o **Suricato**, dos desertos.
 
 | | |
 |---|---|
@@ -34,7 +34,18 @@ Mod de mobs para Minecraft feito com **Fabric**. Atualmente adiciona o **Elefant
 - **Fezes:** chance baixa de jogar fezes num jogador próximo (em média uma vez por minuto). Funcionam como a bola de neve (empurram, sem dano) e o jogador também pode arremessá-las. Os adultos deixam fezes no chão a cada 5 a 10 minutos, como a galinha bota ovos.
 - **Drops:** nenhum item.
 
-Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chimpanze.md).
+### Suricato (`mobmod:meerkat`)
+
+- **Tamanho:** cerca de 0,6 bloco em pé (o dobro do real, para ficar visível). Machos são 15% maiores.
+- **Comportamento:** neutro. Vive em grupos de 3 a 6, anda de quatro e com frequência fica em pé nas patas de trás para vigiar, encarando o jogador que estiver perto. O grupo ataca junto quem machucar um deles, e os adultos caçam traças e endermites.
+- **Toca:** entra na terra (areia, terra, grama...) para se esconder. Foge assim de monstros e de jogadores correndo, com um grito de alarme que manda o grupo inteiro para baixo. Também dorme embaixo da terra à noite e descansa lá de vez em quando. Escondido, não pode ser atingido nem ferido, e volta para a superfície quando o perigo passa.
+- **Animações:** transição suave entre de quatro e em pé, passinhos rápidos, cabeça que varre os arredores, cauda e orelhas que mexem e bote ao morder.
+- **Atributos:** 10 de vida, 2 de dano, velocidade 0.3.
+- **Spawn:** desertos (`#c:is_desert`), nascendo na areia.
+- **Reprodução:** olho de aranha e ovo. Só um macho e uma fêmea geram filhotes.
+- **Drops:** nenhum item.
+
+Fichas completas: [Elefante](docs/mobs/elefante.md), [Chimpanzé](docs/mobs/chimpanze.md) e [Suricato](docs/mobs/suricato.md).
 
 ### Para todos os mobs
 
@@ -45,6 +56,7 @@ Fichas completas: [Elefante](docs/mobs/elefante.md) e [Chimpanzé](docs/mobs/chi
 
 ![Variantes do elefante](docs/imagens/elefante-variantes.png)
 ![Variantes do chimpanzé](docs/imagens/chimpanze-variantes.png)
+![Variantes do suricato](docs/imagens/suricato-variantes.png)
 
 Detalhes em [genetica.md](docs/projeto/genetica.md). Cada mob tem sua ficha completa em [docs/mobs](docs/mobs/README.md).
 

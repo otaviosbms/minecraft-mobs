@@ -6,6 +6,7 @@ Ficha completa de cada mob do mod: atributos, IA, reprodução, variantes, spawn
 |---|---|---|---|---|---|
 | [Elefante](elefante.md) | `mobmod:elephant` | Neutro | Savanas | 60 | 2.6 × 3.0 |
 | [Chimpanzé](chimpanze.md) | `mobmod:chimpanzee` | Neutro | Selvas | 24 | 0.8 × 1.05 |
+| [Suricato](suricato.md) | `mobmod:meerkat` | Neutro | Desertos | 10 | 0.4 × 0.6 |
 
 Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md).
 

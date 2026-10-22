@@ -14,7 +14,7 @@
 
 - [projeto/visao-geral.md](projeto/visao-geral.md) — arquitetura, estrutura de pastas, datagen e build
 - [projeto/como-adicionar-um-mob.md](projeto/como-adicionar-um-mob.md) — passo a passo para criar um mob novo
-- [mobs/README.md](mobs/README.md) — índice dos mobs, com uma ficha por mob ([Elefante](mobs/elefante.md), [Chimpanzé](mobs/chimpanze.md))
+- [mobs/README.md](mobs/README.md) — índice dos mobs, com uma ficha por mob ([Elefante](mobs/elefante.md), [Chimpanzé](mobs/chimpanze.md), [Suricato](mobs/suricato.md))
 - [projeto/genetica.md](projeto/genetica.md) — sexo, reprodução, variantes de pele e barra de informações
 - [projeto/regeneracao.md](projeto/regeneracao.md) — regeneração de vida por tempo e por comida
 - [analises/analise-mobs-promenade.md](analises/analise-mobs-promenade.md) — análise técnica dos mobs do mod Promenade (referência)

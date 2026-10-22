@@ -53,12 +53,14 @@ public final class ZebraClient implements ClientMob {
 
 São as **únicas** alterações fora das pastas do mob.
 
+Se o mob não nasce em grama (como o suricato, que nasce na areia), passe a própria regra de spawn: `SpawnRule.animal(biomas, peso, min, max, Zebra::checkZebraSpawnRules)`. Biomas sem tag vanilla podem usar as tags de convenção do Fabric (`ConventionalBiomeTags`, por exemplo `IS_DESERT`).
+
 ## 4. Texturas (`src/client/resources/assets/mobmod/textures/`)
 
 - `entity/zebra/zebra.png`, `zebra_albino.png` e `zebra_melanistic.png` (as três variantes de pele são obrigatórias)
-- `item/zebra_spawn_egg.png`
+- `item/zebra_spawn_egg.png`: ícone 16×16 do rosto do animal de frente, no estilo dos outros ovos, com **fundo transparente** (pixels sem cor, não brancos)
 
-Para manter o estilo dos outros mobs, crie `tools/textures/ZebraTexture.java` estendendo `MobTexture` (veja `ChimpanzeeTexture.java`): ele gera as três variantes e o ovo.
+Para manter o estilo dos outros mobs, crie `tools/textures/ZebraTexture.java` estendendo `MobTexture` (veja `ChimpanzeeTexture.java` ou `MeerkatTexture.java`): ele gera as três variantes. O ovo pode ser um PNG desenhado à mão (elefante, chimpanzé) ou um mapa de pixels no próprio gerador (`MeerkatTexture.EGG`).
 
 ## 5. Gerar dados e testar
 

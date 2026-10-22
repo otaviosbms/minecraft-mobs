@@ -2,14 +2,17 @@
   "entity.mobmod.chimpanzee": "Chimpanzee",
   "entity.mobmod.elephant": "Elephant",
   "entity.mobmod.feces": "Feces",
+  "entity.mobmod.meerkat": "Meerkat",
   "item.mobmod.chimpanzee_spawn_egg": "Chimpanzee Spawn Egg",
   "item.mobmod.elephant_spawn_egg": "Elephant Spawn Egg",
   "item.mobmod.feces": "Feces",
+  "item.mobmod.meerkat_spawn_egg": "Meerkat Spawn Egg",
   "mobmod.sex.female": "Female",
   "mobmod.sex.male": "Male",
   "mobmod.skin_variant.albino": "Albino",
   "mobmod.skin_variant.melanistic": "Melanistic",
   "mobmod.skin_variant.normal": "Normal",
   "tag.item.mobmod.chimpanzee_food": "Food for Chimpanzees",
-  "tag.item.mobmod.elephant_food": "Food for Elephants"
+  "tag.item.mobmod.elephant_food": "Food for Elephants",
+  "tag.item.mobmod.meerkat_food": "Food for Meerkats"
 }
