@@ -192,7 +192,7 @@ Todas procedurais, calculadas em `ElephantModel.setupAnim`:
 |---|---|
 | Ovo gerador | `mobmod:elephant_spawn_egg` ("Elephant Spawn Egg" / "Ovo Gerador de Elefante") |
 | Aba criativa | Spawn Eggs, logo depois do ovo de Elder Guardian |
-| Textura do ovo | `textures/item/elephant_spawn_egg.png` |
+| Textura do ovo | `textures/item/elephant_spawn_egg.png`: o rosto do elefante de frente, desenhado à mão, com fundo transparente |
 
 ## Traduções
 

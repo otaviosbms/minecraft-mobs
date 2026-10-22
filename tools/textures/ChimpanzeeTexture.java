@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Paints the chimpanzee textures (normal, albino, melanistic) and its spawn egg on the UV layout of ChimpanzeeModel,
+ * Paints the chimpanzee textures (normal, albino, melanistic) on the UV layout of ChimpanzeeModel,
  * in the same art style as the elephant (see {@link MobTexture}).
  * <p>
  * The model is built at double detail (then scaled down), so every face has twice the pixels of a normal model:
@@ -46,7 +46,7 @@ public class ChimpanzeeTexture extends MobTexture {
     public static void main(String[] args) throws IOException {
         File texturesDir = new File(args.length > 0 ? args[0] : ".");
         new ChimpanzeeTexture().writeAll(texturesDir);
-        writeSpawnEgg(texturesDir, "chimpanzee", 0x141110, 0x2b2421, 0xd2b6a8, 0x5a4c45, 91);
+        // The spawn egg (textures/item/chimpanzee_spawn_egg.png) is hand-drawn, not generated here
     }
 
     @Override

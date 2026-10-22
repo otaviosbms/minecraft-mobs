@@ -27,7 +27,7 @@ Um primata neutro das selvas, em tamanho real (cerca de 1 bloco de altura andand
 | Renderer e render state | [`ChimpanzeeRenderer.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeRenderer.java), [`ChimpanzeeRenderState.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeRenderState.java) |
 | Registro cliente | [`ChimpanzeeClient.java`](../../src/client/java/com/otavi/mobmod/client/mob/chimpanzee/ChimpanzeeClient.java) |
 | Texturas | `src/client/resources/assets/mobmod/textures/entity/chimpanzee/` |
-| Gerador das texturas e do ovo | [`tools/textures/ChimpanzeeTexture.java`](../../tools/textures/ChimpanzeeTexture.java) |
+| Gerador das texturas | [`tools/textures/ChimpanzeeTexture.java`](../../tools/textures/ChimpanzeeTexture.java) |
 | JSON gerados (lang, tag, modelo do ovo) | `src/main/generated/` (via `./gradlew runDatagen`) |
 
 ## Atributos
@@ -265,7 +265,7 @@ Os deslocamentos (respiração e passos) são multiplicados pela escala da camad
 |---|---|
 | Ovo gerador | `mobmod:chimpanzee_spawn_egg` ("Chimpanzee Spawn Egg" / "Ovo Gerador de Chimpanzé") |
 | Aba criativa | Spawn Eggs, logo depois do ovo de Galinha |
-| Textura do ovo | `textures/item/chimpanzee_spawn_egg.png` (marrom-escuro com manchas claras, gerada pelo mesmo gerador) |
+| Textura do ovo | `textures/item/chimpanzee_spawn_egg.png`: o rosto do chimpanzé de frente, desenhado à mão, com fundo transparente |
 
 ### Fezes
 
