@@ -33,7 +33,7 @@ public class MeerkatBurrowGoal extends Goal {
     /**
      * At night it checks every 10 seconds whether the sun is up.
      */
-    private static final int NIGHT_TICKS = 200;
+    static final int NIGHT_TICKS = 200;
 
     private final Meerkat meerkat;
     @Nullable

@@ -21,6 +21,7 @@ import java.util.Map;
  * long tusk   2x13x2   at (188, 70)  male
  * ear         1x15x13  at (0, 106)   mirrored for the left ear
  * tail        2x14x2   at (30, 106)
+ * eyelid      0x1x2    at (200, 70)  mirrored for the left eye, shown while asleep
  * </pre>
  */
 public class ElephantTexture extends MobTexture {
@@ -78,6 +79,7 @@ public class ElephantTexture extends MobTexture {
         this.tusk(188, 70, 2, 13, 2);
         this.ear(0, 106, 1, 15, 13);
         this.tail(30, 106, 2, 14, 2);
+        this.eyelid(200, 70, 0, 1, 2);
     }
 
     private void body(int u, int v, int w, int h, int d) {
@@ -119,6 +121,14 @@ public class ElephantTexture extends MobTexture {
         this.material[mirrored ? x : x + 1][y] = EYE_SHINE;
         // Wrinkle above the eye
         this.fillShade(x - 1, y - 1, 4, 1, -0.4);
+    }
+
+    /**
+     * Closed eye, laid over the painted one while the elephant sleeps: skin with a dark crease where the eye was.
+     */
+    private void eyelid(int u, int v, int w, int h, int d) {
+        this.shadedBox(u, v, w, h, d, SKIN, 61);
+        this.fillShade(u, v + d, 2 * d + 2 * w, h, -0.55);
     }
 
     private void trunk(int u, int v, int w, int h, int d, int segment) {

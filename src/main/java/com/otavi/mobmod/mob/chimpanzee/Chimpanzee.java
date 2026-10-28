@@ -187,7 +187,8 @@ public class Chimpanzee extends ModAnimal {
             if (this.letGoTicks > 0) {
                 this.letGoTicks--;
             }
-            this.entityData.set(DATA_CLIMBING, (this.horizontalCollision && this.letGoTicks == 0) || this.isSlidingOnTrunk());
+            // Asleep, being pushed against a wall does not send it up the wall
+            this.entityData.set(DATA_CLIMBING, (this.horizontalCollision && this.letGoTicks == 0 && !this.isAsleep()) || this.isSlidingOnTrunk());
         }
     }
 

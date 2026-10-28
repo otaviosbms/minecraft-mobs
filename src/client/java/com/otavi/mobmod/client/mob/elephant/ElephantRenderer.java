@@ -29,4 +29,12 @@ public class ElephantRenderer extends ModMobRenderer<Elephant, ElephantRenderSta
         int tick = elephant.getAttackAnimationTick();
         state.attackProgress = tick > 0 ? Math.max(0.0F, (tick - partialTick) / Elephant.ATTACK_ANIMATION_LENGTH) : 0.0F;
     }
+
+    /**
+     * Lies on its side like the default pose: the body (26 px wide) rests on the ground, the flat ears just above it.
+     */
+    @Override
+    protected float getSleepingHalfWidth(ElephantRenderState state) {
+        return state.boundingBoxWidth * 0.32F;
+    }
 }

@@ -4,7 +4,7 @@ Exemplo para um mob chamado `zebra`. Use o Elefante (`mob/elephant`) como refer�
 
 ## 1. Lado comum: `src/main/java/com/otavi/mobmod/mob/zebra/`
 
-**`Zebra.java`**: a entidade. Animais estendem **`ModAnimal`**, que já traz sexo, variantes de pele e a reprodução macho + fêmea (veja [genetica.md](genetica.md)), além da regeneração de vida por tempo e por comida (veja [regeneracao.md](regeneracao.md)); não implemente `getBreedOffspring`. Defina `createZebraAttributes()` e `registerGoals()`. Goals reaproveitáveis ficam em `entity/goal/`.
+**`Zebra.java`**: a entidade. Animais estendem **`ModAnimal`**, que já traz sexo, variantes de pele e a reprodução macho + fêmea (veja [genetica.md](genetica.md)), além da regeneração de vida por tempo e por comida (veja [regeneracao.md](regeneracao.md)) e do sono à noite (veja [sono.md](sono.md): dê ao mob a sua pose de dormir e pálpebras); não implemente `getBreedOffspring`. Defina `createZebraAttributes()` e `registerGoals()`. Goals reaproveitáveis ficam em `entity/goal/`.
 
 **`ZebraMob.java`**: a definição, que é a única fonte de verdade do mob:
 

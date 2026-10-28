@@ -179,6 +179,34 @@ public class MobGameTests {
     }
 
     @GameTest(maxTicks = 100)
+    public void everyAnimalSleepsAndWakesUpWhenHurt(GameTestHelper helper) {
+        // Sand, so the meerkat sleeps in its burrow
+        sandFloor(helper);
+        var animals = new ArrayList<ModAnimal>();
+        for (var mob : ModMobs.ALL) {
+            if (helper.spawn(mob.type(), new BlockPos(2, 1, 2)) instanceof ModAnimal animal) {
+                animals.add(animal);
+            }
+        }
+        helper.runAfterDelay(5, () -> {
+            for (var animal : animals) {
+                helper.assertTrue(animal.fallAsleep(), animal.getType().toShortString() + " could not fall asleep");
+            }
+            // Long enough for the meerkat to dig in
+            helper.runAfterDelay(Meerkat.DIG_LENGTH + 5, () -> {
+                for (var animal : animals) {
+                    helper.assertTrue(animal.isAsleep(), animal.getType().toShortString() + " is not asleep");
+                    // An animal hidden in its burrow cannot be hurt, so it sleeps on
+                    if (animal.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 1.0F)) {
+                        helper.assertFalse(animal.isAsleep(), animal.getType().toShortString() + " kept sleeping after being hurt");
+                    }
+                }
+                helper.succeed();
+            });
+        });
+    }
+
+    @GameTest(maxTicks = 100)
     public void chimpanzeeDoesNotWalkOffHighLedges(GameTestHelper helper) {
         // A single block 5 high: walking off it would be a fall far higher than Chimpanzee.SAFE_DROP
         var platform = new BlockPos(3, 5, 3);

@@ -26,6 +26,7 @@ import java.util.Map;
  * haunch   5x6x6    at (14, 46)   mirrored for the left leg
  * foot     5x3x6    at (38, 46)   mirrored for the left leg
  * tail     2x2x14   at (0, 60)
+ * eyelid   0x2x2    at (90, 24)   mirrored for the left eye, shown while asleep
  * </pre>
  */
 public class MeerkatTexture extends MobTexture {
@@ -133,6 +134,7 @@ public class MeerkatTexture extends MobTexture {
         this.haunch(14, 46, 5, 6, 6);
         this.foot(38, 46, 5, 3, 6);
         this.tail(0, 60, 2, 2, 14);
+        this.eyelid(90, 24, 0, 2, 2);
     }
 
     /*==========*/
@@ -212,6 +214,15 @@ public class MeerkatTexture extends MobTexture {
         int eyeX = frontAtLeft ? x0 + 2 : x0 + d - 4;
         this.fill(eyeX, y + 2, 2, 2, EYE);
         this.material[frontAtLeft ? eyeX : eyeX + 1][y + 2] = EYE_SHINE;
+    }
+
+    /**
+     * Closed eye, laid over the painted one while the meerkat sleeps: the dark mask with a black line of lashes.
+     */
+    private void eyelid(int u, int v, int w, int h, int d) {
+        this.shadedBox(u, v, w, h, d, MASK, 71);
+        this.fillShade(u, v + d, 2 * d + 2 * w, 1, 0.2);
+        this.fillShade(u, v + d + h - 1, 2 * d + 2 * w, 1, -0.6);
     }
 
     private void snout(int u, int v, int w, int h, int d) {

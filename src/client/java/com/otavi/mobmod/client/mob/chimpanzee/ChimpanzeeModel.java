@@ -26,6 +26,8 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
     public static final String SNOUT = "snout";
     public static final String JAW = "jaw";
     public static final String SWELLING = "swelling";
+    public static final String RIGHT_EYELID = "right_eyelid";
+    public static final String LEFT_EYELID = "left_eyelid";
 
     public static final int TEXTURE_SIZE = 256;
 
@@ -35,9 +37,19 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
     private static final float ADULT_SCALE = 0.37F;
     private static final float BODY_PITCH = -0.35F;
     private static final float CLIMBING_BODY_PITCH = -1.0F;
+    /**
+     * Asleep, curled up: the back rounds forward a little instead of sloping up to the shoulders.
+     */
+    private static final float SLEEPING_BODY_PITCH = 0.2F;
+    /**
+     * How far the eyelids sit in front of the face, so they do not flicker against the painted eyes.
+     */
+    private static final float EYELID_GAP = 0.05F;
 
     private final ModelPart body;
     private final ModelPart head;
+    private final ModelPart rightEyelid;
+    private final ModelPart leftEyelid;
     private final ModelPart jaw;
     private final ModelPart rightEar;
     private final ModelPart leftEar;
@@ -52,6 +64,8 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
         this.body = root.getChild(PartNames.BODY);
         this.head = root.getChild(PartNames.HEAD);
         this.jaw = this.head.getChild(JAW);
+        this.rightEyelid = this.head.getChild(RIGHT_EYELID);
+        this.leftEyelid = this.head.getChild(LEFT_EYELID);
         this.rightEar = this.head.getChild(PartNames.RIGHT_EAR);
         this.leftEar = this.head.getChild(PartNames.LEFT_EAR);
         this.swelling = this.body.getChild(SWELLING);
@@ -97,6 +111,11 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
                 .texOffs(108, 52).addBox(-2.0F, -4.0F, -4.0F, 2.0F, 8.0F, 8.0F), PartPose.offset(-9.0F, -6.0F, -6.0F));
         head.addOrReplaceChild(PartNames.LEFT_EAR, CubeListBuilder.create()
                 .texOffs(108, 52).mirror().addBox(0.0F, -4.0F, -4.0F, 2.0F, 8.0F, 8.0F), PartPose.offset(9.0F, -6.0F, -6.0F));
+        // Eyelids: flat patches of skin just in front of the painted eyes (4x2 under the brow ridge), shown while asleep
+        head.addOrReplaceChild(RIGHT_EYELID, CubeListBuilder.create()
+                .texOffs(132, 52).addBox(0.0F, 0.0F, 0.0F, 4.0F, 2.0F, 0.0F), PartPose.offset(-6.0F, -6.0F, -14.0F - EYELID_GAP));
+        head.addOrReplaceChild(LEFT_EYELID, CubeListBuilder.create()
+                .texOffs(132, 52).mirror().addBox(0.0F, 0.0F, 0.0F, 4.0F, 2.0F, 0.0F), PartPose.offset(2.0F, -6.0F, -14.0F - EYELID_GAP));
 
         return mesh;
     }
@@ -141,6 +160,8 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
         this.head.zRot = Mth.sin(age * 0.03F) * 0.1F * still;
         this.rightEar.zRot = -twitch(age * 0.17F) * 0.35F;
         this.leftEar.zRot = twitch(age * 0.13F + 2.0F) * 0.35F;
+
+        this.animateSleeping(state, px);
 
         // Hoot: raise the head and open the mouth while calling
         if (state.hootProgress > 0.0F) {
@@ -199,6 +220,35 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
         this.leftArm.zRot = -0.15F;
         // Looks up the wall
         this.head.xRot -= 0.6F;
+    }
+
+    /**
+     * Chimpanzees sleep curled up on their side, like in their nests (the renderer rolls the model over): knees pulled
+     * up to the chest, arms hugged in front of them, head tucked down and eyes closed. The breathing slows down.
+     */
+    private void animateSleeping(ChimpanzeeRenderState state, float px) {
+        this.rightEyelid.visible = state.eyesClosed();
+        this.leftEyelid.visible = state.eyesClosed();
+        float sleep = state.sleepAmount;
+        if (sleep <= 0.0F) {
+            return;
+        }
+        float awake = 1.0F - sleep;
+        this.body.xRot = Mth.lerp(sleep, this.body.xRot, SLEEPING_BODY_PITCH);
+        this.rightLeg.xRot = Mth.lerp(sleep, this.rightLeg.xRot, -1.35F);
+        this.leftLeg.xRot = Mth.lerp(sleep, this.leftLeg.xRot, -1.2F);
+        this.rightArm.xRot = Mth.lerp(sleep, this.rightArm.xRot, -0.95F);
+        this.leftArm.xRot = Mth.lerp(sleep, this.leftArm.xRot, -0.8F);
+        // Turned inwards, so the hands meet in front of the chest (outwards, the upper arm would point at the sky)
+        this.rightArm.yRot = -sleep * 0.6F;
+        this.leftArm.yRot = sleep * 0.55F;
+        // The curled back brings the shoulders, and the head with them, down towards the knees
+        this.head.y += sleep * 3.0F * px;
+        this.head.xRot += sleep * 0.6F;
+        this.head.zRot *= awake;
+        this.jaw.xRot *= awake;
+        this.rightEar.zRot *= awake;
+        this.leftEar.zRot *= awake;
     }
 
     /**

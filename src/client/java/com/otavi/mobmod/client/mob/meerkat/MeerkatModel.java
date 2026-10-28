@@ -24,6 +24,9 @@ import net.minecraft.util.Mth;
  * UV layout (128x128) is documented in tools/textures/MeerkatTexture.java.
  */
 public class MeerkatModel extends EntityModel<MeerkatRenderState> {
+    public static final String RIGHT_EYELID = "right_eyelid";
+    public static final String LEFT_EYELID = "left_eyelid";
+
     public static final int TEXTURE_SIZE = 128;
 
     /**
@@ -42,6 +45,15 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
     private static final float ARM_STAND = -0.35F;
     private static final float TAIL_STAND = -0.55F;
     private static final float TAIL_WALK = 0.35F;
+    /**
+     * Asleep it lies flat on its belly: the body level with the ground and lowered until the belly touches it.
+     */
+    private static final float SLEEP_PITCH = Mth.HALF_PI;
+    private static final float SLEEP_DROP = 3.5F;
+    /**
+     * How far the eyelids sit outside the face, so they do not flicker against the painted eyes.
+     */
+    private static final float EYELID_GAP = 0.05F;
 
     // Where the head and the arms join the body, from the hips in body space
     private static final float NECK_Y = -15.0F;
@@ -54,6 +66,8 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
     private final ModelPart head;
     private final ModelPart rightEar;
     private final ModelPart leftEar;
+    private final ModelPart rightEyelid;
+    private final ModelPart leftEyelid;
     private final ModelPart rightArm;
     private final ModelPart leftArm;
     private final ModelPart rightLeg;
@@ -66,6 +80,8 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
         this.head = root.getChild(PartNames.HEAD);
         this.rightEar = this.head.getChild(PartNames.RIGHT_EAR);
         this.leftEar = this.head.getChild(PartNames.LEFT_EAR);
+        this.rightEyelid = this.head.getChild(RIGHT_EYELID);
+        this.leftEyelid = this.head.getChild(LEFT_EYELID);
         this.rightArm = root.getChild(PartNames.RIGHT_ARM);
         this.leftArm = root.getChild(PartNames.LEFT_ARM);
         this.rightLeg = root.getChild(PartNames.RIGHT_LEG);
@@ -95,6 +111,11 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
                 .texOffs(78, 24).addBox(-2.0F, -1.5F, -1.5F, 2.0F, 3.0F, 3.0F), PartPose.offset(-7.0F, -5.5F, 1.0F));
         head.addOrReplaceChild(PartNames.LEFT_EAR, CubeListBuilder.create()
                 .texOffs(78, 24).mirror().addBox(0.0F, -1.5F, -1.5F, 2.0F, 3.0F, 3.0F), PartPose.offset(7.0F, -5.5F, 1.0F));
+        // Eyelids: flat patches of the mask just outside the painted eyes (2x2 on the sides of the head), shown while asleep
+        head.addOrReplaceChild(RIGHT_EYELID, CubeListBuilder.create()
+                .texOffs(90, 24).addBox(0.0F, 0.0F, 0.0F, 0.0F, 2.0F, 2.0F), PartPose.offset(-7.0F - EYELID_GAP, -7.0F, -6.0F));
+        head.addOrReplaceChild(LEFT_EYELID, CubeListBuilder.create()
+                .texOffs(90, 24).mirror().addBox(0.0F, 0.0F, 0.0F, 0.0F, 2.0F, 2.0F), PartPose.offset(7.0F + EYELID_GAP, -7.0F, -6.0F));
 
         // Short arms in front of the chest: paws held forward when standing, front legs on all fours
         CubeListBuilder arm = CubeListBuilder.create().texOffs(0, 46).addBox(-1.5F, 0.0F, -1.5F, 3.0F, 8.0F, 3.0F);
@@ -140,8 +161,15 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
         float swing = Mth.cos(pos * 1.2F) * speed;
         float bob = Math.abs(Mth.sin(pos * 1.2F)) * speed * fours;
 
-        this.body.xRot = WALK_PITCH * fours;
+        // Asleep it lies flat on its belly, so the body pitches all the way down and sinks onto the ground
+        float sleep = state.sleepAmount;
+        float awake = 1.0F - sleep;
+        float drop = SLEEP_DROP * sleep * px;
+        this.body.xRot = Mth.lerp(sleep, WALK_PITCH * fours, SLEEP_PITCH);
         this.body.y -= bob * 1.5F * px;
+        this.body.y += drop;
+        this.rightLeg.y += drop;
+        this.leftLeg.y += drop;
         // Breathing, faster than a big animal
         this.body.y += Mth.sin(age * 0.15F) * 0.4F * px * still;
         float shift = WALK_SHIFT * fours * px;
@@ -149,8 +177,9 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
         this.rightLeg.z += shift;
         this.leftLeg.z += shift;
 
-        this.rightLeg.xRot = -swing * 0.8F * fours;
-        this.leftLeg.xRot = swing * 0.8F * fours;
+        // Hind legs stretched out behind when asleep
+        this.rightLeg.xRot = Mth.lerp(sleep, -swing * 0.8F * fours, 1.3F);
+        this.leftLeg.xRot = Mth.lerp(sleep, swing * 0.8F * fours, 1.3F);
 
         // Head and arms follow the neck and the shoulders wherever the body pitch puts them
         this.attachToBody(this.head, NECK_Y, NECK_Z, px);
@@ -172,8 +201,10 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
         this.tail.xRot = tailAngle - this.body.xRot;
         this.tail.yRot = Mth.sin(age * 0.12F) * 0.15F + Mth.sin(pos * 1.2F) * 0.2F * speed;
 
-        this.rightEar.zRot = -twitch(age * 0.19F) * 0.4F;
-        this.leftEar.zRot = twitch(age * 0.15F + 2.0F) * 0.4F;
+        this.rightEar.zRot = -twitch(age * 0.19F) * 0.4F * awake;
+        this.leftEar.zRot = twitch(age * 0.15F + 2.0F) * 0.4F * awake;
+
+        this.animateSleeping(state, sleep, px);
 
         // Digging: nose down, the front paws scratching fast at the ground in turn
         if (state.digging) {
@@ -192,6 +223,29 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
             this.rightArm.xRot -= lunge * 1.0F;
             this.leftArm.xRot -= lunge * 1.0F;
         }
+    }
+
+    /**
+     * Meerkats sleep sprawled flat on their belly (the body is already lying down, see {@link #setupAnim}): front
+     * paws stretched forward along the ground, the chin resting on them, the tail curled round to one side and the
+     * eyes closed. In the wild they sleep in their burrows; this pose is for ground too hard to dig.
+     */
+    private void animateSleeping(MeerkatRenderState state, float sleep, float px) {
+        this.rightEyelid.visible = state.eyesClosed();
+        this.leftEyelid.visible = state.eyesClosed();
+        if (sleep <= 0.0F) {
+            return;
+        }
+        this.rightArm.xRot = Mth.lerp(sleep, this.rightArm.xRot, -1.45F);
+        this.leftArm.xRot = Mth.lerp(sleep, this.leftArm.xRot, -1.45F);
+        this.rightArm.yRot = sleep * 0.15F;
+        this.leftArm.yRot = -sleep * 0.15F;
+        this.head.y += sleep * 1.5F * px;
+        this.head.xRot = Mth.lerp(sleep, this.head.xRot, 0.25F);
+        this.head.zRot = sleep * 0.15F;
+        // Draped over the rump down to the ground and curled round to the side
+        this.tail.xRot = Mth.lerp(sleep, this.tail.xRot, -0.55F - this.body.xRot);
+        this.tail.yRot = Mth.lerp(sleep, this.tail.yRot, 0.9F);
     }
 
     /**

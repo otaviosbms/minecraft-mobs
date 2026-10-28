@@ -103,7 +103,7 @@ O suricato cava o chão para se esconder e depois volta para a superfície:
 | Motivo | Quando | Quanto tempo fica embaixo |
 |---|---|---|
 | Ameaça | Um monstro à vista a até **8 blocos** (traças e endermites não contam, são presas) ou um jogador **correndo** a até **5 blocos** | **15 a 30 s**. Depois só sai se não houver ameaça a até 10 blocos; senão espera mais 5 a 10 s e confere de novo |
-| Noite | Quando escurece, cada suricato desce num momento diferente (em média 5 s depois de anoitecer) | Até amanhecer: confere a cada 10 s se o dia já chegou |
+| Noite | Quando escurece, cada suricato desce num momento diferente (em média 5 s depois de anoitecer). É o jeito dele de seguir o [sono](../projeto/sono.md) global: onde o chão é duro demais para cavar, deita na superfície como os outros animais | Até amanhecer: confere a cada 10 s se o dia já chegou |
 | Descanso | De vez em quando, em média a cada **3 min** | **10 a 20 s** |
 
 | | |
@@ -275,7 +275,8 @@ Coberto pelos gametests genéricos (`./gradlew runGameTestServer`), que percorre
 - macho maior que fêmea;
 - só macho + fêmea acasalam;
 - dois pais albinos nunca têm filhote normal;
-- regeneração e cura com comida.
+- regeneração e cura com comida;
+- dorme (na toca, em areia) e acorda ao levar dano.
 
 Testes específicos:
 

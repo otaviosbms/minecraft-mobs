@@ -33,4 +33,12 @@ public class ChimpanzeeRenderer extends ModMobRenderer<Chimpanzee, ChimpanzeeRen
         state.hootProgress = hoot > 0 ? Math.max(0.0F, (hoot - partialTick) / Chimpanzee.HOOT_LENGTH) : 0.0F;
         state.climbing = chimpanzee.onClimbable() && !chimpanzee.onGround();
     }
+
+    /**
+     * Curled up on its side, it rests on its shoulder and arm, which stick out past the body.
+     */
+    @Override
+    protected float getSleepingHalfWidth(ChimpanzeeRenderState state) {
+        return state.boundingBoxWidth * 0.5F;
+    }
 }

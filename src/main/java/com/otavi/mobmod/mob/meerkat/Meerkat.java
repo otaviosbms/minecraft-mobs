@@ -263,6 +263,35 @@ public class Meerkat extends ModAnimal {
         return this.hideReason;
     }
 
+    /*===========*/
+    /*   SLEEP   */
+    /*===========*/
+
+    /**
+     * Meerkats sleep in their burrows ({@link MeerkatBurrowGoal}): the global sleep goal only takes over where the
+     * ground is too hard to dig, and then the meerkat lies down on the surface like the other animals.
+     */
+    @Override
+    public boolean canSleep() {
+        return super.canSleep() && !this.isBurrowed() && !this.canDigHere();
+    }
+
+    /**
+     * Lying on the surface, or underground for the night.
+     */
+    @Override
+    public boolean isAsleep() {
+        return super.isAsleep() || (this.isHidden() && this.hideReason == HideReason.NIGHT);
+    }
+
+    /**
+     * Digs in for the night where it can, otherwise lies down on the surface.
+     */
+    @Override
+    public boolean fallAsleep() {
+        return this.burrow(HideReason.NIGHT, MeerkatBurrowGoal.NIGHT_TICKS) || super.fallAsleep();
+    }
+
     /**
      * From 0 (on the surface) to 1 (fully underground), smoothed between ticks.
      */

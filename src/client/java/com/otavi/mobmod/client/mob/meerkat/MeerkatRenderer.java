@@ -49,6 +49,13 @@ public class MeerkatRenderer extends ModMobRenderer<Meerkat, MeerkatRenderState,
         super.setupRotations(state, poseStack, bodyRot, scale);
     }
 
+    /**
+     * Sleeps flat on its belly, not on its side: the model lays itself down, nothing to turn here.
+     */
+    @Override
+    protected void applySleepPose(MeerkatRenderState state, PoseStack poseStack, float amount) {
+    }
+
     @Override
     protected float getShadowRadius(MeerkatRenderState state) {
         return super.getShadowRadius(state) * (1.0F - state.burrowDepth);

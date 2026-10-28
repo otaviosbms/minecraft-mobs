@@ -24,6 +24,7 @@ import java.util.Map;
  * arm        10x30x10  at (0, 86)    shared by both arms
  * leg        10x18x10  at (44, 86)   shared by both legs
  * swelling   20x12x6   at (0, 140)   adult females only
+ * eyelid      4x2x0    at (132, 52)  mirrored for the left eye, shown while asleep
  * </pre>
  */
 public class ChimpanzeeTexture extends MobTexture {
@@ -100,6 +101,7 @@ public class ChimpanzeeTexture extends MobTexture {
         this.limb(0, 86, 10, 30, 10, 8, 101);
         this.limb(44, 86, 10, 18, 10, 5, 113);
         this.swelling(0, 140, 20, 12, 6);
+        this.eyelid(132, 52, 4, 2, 0);
     }
 
     /*=========*/
@@ -168,6 +170,16 @@ public class ChimpanzeeTexture extends MobTexture {
         // Upper eyelid and the skin fold under the eye
         this.fillShade(x - 1, y - 1, 6, 1, -0.45);
         this.fillShade(x, y + 2, 4, 1, -0.2);
+    }
+
+    /**
+     * Closed eye, laid over the painted one while the chimpanzee sleeps: the heavy upper lid down,
+     * with the dark line of the lashes at the bottom.
+     */
+    private void eyelid(int u, int v, int w, int h, int d) {
+        this.shadedBox(u, v, w, h, d, SKIN, 57);
+        this.fillShade(u, v + d, 2 * d + 2 * w, 1, -0.25);
+        this.fillShade(u, v + d + h - 1, 2 * d + 2 * w, 1, -0.7);
     }
 
     private void brow(int u, int v, int w, int h, int d) {

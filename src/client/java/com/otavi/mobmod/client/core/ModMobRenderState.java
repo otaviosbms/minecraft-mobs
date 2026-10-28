@@ -15,4 +15,15 @@ public class ModMobRenderState extends LivingEntityRenderState {
     public float maxHealth;
     public Component displayName = Component.empty();
     public boolean showInfoBar;
+    /**
+     * From 0 (awake) to 1 (lying down asleep).
+     */
+    public float sleepAmount;
+
+    /**
+     * Eyes shut halfway through lying down: models show their eyelids over the painted eyes.
+     */
+    public boolean eyesClosed() {
+        return this.sleepAmount > 0.5F;
+    }
 }
