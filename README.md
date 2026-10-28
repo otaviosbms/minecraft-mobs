@@ -123,7 +123,6 @@ Adicionar um mob é criar as duas pastas dele, colocar uma linha em `ModMobs` e 
 - [Sono](docs/projeto/sono.md)
 - [Animais do jogo adaptados](docs/projeto/animais-vanilla.md)
 - [Fichas dos mobs](docs/mobs/README.md)
-- [Análise dos mobs do Promenade](docs/analises/analise-mobs-promenade.md) (referência usada na criação do mod)
 
 ## Licença
 

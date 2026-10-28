@@ -6,8 +6,6 @@
 |---|---|
 | [`projeto/`](projeto/) | Documentação do próprio mod: estrutura, build, arquitetura |
 | [`mobs/`](mobs/) | Ficha completa de cada mob (atributos, IA, spawn, drops, modelo...) |
-| [`analises/`](analises/) | Análises técnicas de código de referência (ex.: Promenade) |
-| [`prompts/`](prompts/) | Prompts usados para guiar o trabalho com IA |
 | [`imagens/`](imagens/) | Imagens usadas na documentação |
 
 ## Documentos
@@ -19,8 +17,6 @@
 - [projeto/regeneracao.md](projeto/regeneracao.md) — regeneração de vida por tempo e por comida
 - [projeto/animais-vanilla.md](projeto/animais-vanilla.md) — adaptar animais do jogo (camelo, tatu) às regras do mod: mixins, texturas geradas em tempo real, checklist
 - [projeto/sono.md](projeto/sono.md) — sono à noite de todos os animais (pose de cada um, olhos fechados, "z Z z", quando acordam)
-- [analises/analise-mobs-promenade.md](analises/analise-mobs-promenade.md) — análise técnica dos mobs do mod Promenade (referência)
-- [prompts/prompt-analise-mobs-promenade.md](prompts/prompt-analise-mobs-promenade.md) — prompt de análise do Promenade + criação de mob personalizado
 
 ## Convenções
 
