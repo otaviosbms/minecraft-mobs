@@ -2,7 +2,12 @@
 
 Além de criar animais do zero, o mod **adapta animais que já existem no Minecraft** para seguirem exatamente as mesmas regras dos seus próprios animais. O animal continua sendo o do jogo (`minecraft:camel`, por exemplo), com tudo o que o jogo já tem, e ganha os sistemas globais do mod. Todo exemplar no mundo é afetado: os que nascem naturalmente, os das vilas e os de mundos salvos antes do mod.
 
-O primeiro animal adaptado é o [Camelo](../mobs/camelo.md).
+Animais adaptados:
+
+| Animal | Pose de dormir (do jogo) | Ficha |
+|---|---|---|
+| Camelo (`minecraft:camel`) | Ajoelha (animação de sentar) | [camelo.md](../mobs/camelo.md) |
+| Tatu (`minecraft:armadillo`) | Enrola na carapaça | [tatu.md](../mobs/tatu.md) |
 
 ## O que muda e o que fica
 
@@ -16,7 +21,7 @@ O primeiro animal adaptado é o [Camelo](../mobs/camelo.md).
 | | [Sono](sono.md) à noite, com pose própria, olhos fechados e "z Z z" |
 | | Coberto pelos gametests genéricos |
 
-O comportamento do animal **não** é mudado: o camelo continua pacífico e foge quando é ferido. Só entram os sistemas globais.
+O comportamento do animal **não** é mudado: o camelo continua pacífico e foge quando é ferido, o tatu continua enrolando quando se assusta. Só entram os sistemas globais.
 
 ## Arquitetura
 
@@ -45,9 +50,23 @@ Ficam em `src/main/java/com/otavi/mobmod/mixin/`, registrados em `src/main/resou
 
 Todo gancho confere `CamelAdaptation.isAdapted(camel)`: o **camelo husk** (`minecraft:camel_husk`) herda da classe do camelo, mas fica como no jogo.
 
+### Mixins do tatu
+
+| Mixin | Alvo | O que faz |
+|---|---|---|
+| `ArmadilloMixin` | `Armadillo` | Implementa `ModCreature` e injeta em `defineSynchedData`, `addAdditionalSaveData`/`readAdditionalSaveData`, `tick`, `customServerAiStep`, `actuallyHurt`, `getAmbientSound`, `getBreedOffspring` e `mobInteract`. O tatu não sobrescreve `finalizeSpawn` nem `canMate`, então o mixin **acrescenta** esses dois métodos (chamando o vanilla por `super`) em vez de injetar neles |
+| `ArmadilloAiMixin` | `ArmadilloAi` (o lambda que chama `rollOut`) | Sem perigo por perto, a IA vanilla desenrola na hora qualquer tatu enrolado: dormindo, ele fica na carapaça |
+| `ArmadilloBallUpMixin` | `ArmadilloAi$ArmadilloBallUp.tick` | Com um perigo por perto, a IA vanilla espia e desenrola quando passa: dormindo, nada disso acontece |
+
+O `ArmadilloAiMixin` mira um lambda (`lambda$static$2`), cujo nome é gerado pelo compilador. Se uma atualização do Minecraft mudar esse nome, o jogo para na inicialização com um erro de mixin, e o alvo precisa ser procurado de novo (é o lambda que chama `Armadillo.rollOut`).
+
 ### Sono em IA de Brain
 
 Os animais do mod dormem pelo `SleepGoal`. O camelo usa Brain (`CamelAi`), então o goal não roda: o `CamelSleep` (`mob/camel/CamelSleep.java`) é chamado a cada tick do servidor depois da IA vanilla, com o mesmo `SleepSchedule`. A pose é a que o jogo já tem para o camelo descansar: ele **ajoelha** (`sitDown()`) e, ao acordar por qualquer motivo, **levanta** (`standUp()`).
+
+O tatu faz o mesmo com o `ArmadilloSleep`. Para dormir, ele **enrola na carapaça** (`rollUp()`) e, ao acordar, desenrola (`rollOut()`). A exceção é quando um perigo o mantém enrolado: aí a IA vanilla cuida dele. Duas diferenças:
+- No jogo, só o comportamento de se esconder termina de enrolar (de `ROLLING` para `SCARED`), e ele só roda com perigo. Por isso o `ArmadilloSleep` faz essa troca sozinho para quem está dormindo.
+- Enrolar encolhe o hitbox, e o tatu sai do chão por um tick. Por isso, dormindo dentro da carapaça, ele não precisa estar no chão (`AnimalTraits.canSleep(false)`).
 
 ## Lado cliente
 
@@ -90,16 +109,17 @@ Os testes genéricos percorrem `ModMobs.allAnimalTypes()` (os criados e os adapt
 - a comida cura 10% sem love mode;
 - dorme e acorda ao ser ferido.
 
-O teste de loot continua só para os mobs criados, porque a loot do adaptado é a do jogo. Testes do camelo:
+O teste de loot continua só para os mobs criados, porque a loot do adaptado é a do jogo. Testes específicos:
 
 | Teste | O que verifica |
 |---|---|
 | `camelKneelsToSleepAndGetsUpWhenItWakes` | Dormindo, ele ajoelha e a IA vanilla não o levanta por 4 s. Ao acordar, levanta |
 | `camelHuskIsNotAdapted` | O camelo husk fica como no jogo; o camelo é adaptado |
+| `armadilloRollsUpToSleepAndRollsOutWhenItWakes` | Dormindo, o tatu enrola e fica enrolado. Ao acordar, desenrola |
 
 ## Como adaptar o próximo animal
 
-Exemplo para a lhama (`minecraft:llama`).
+Exemplo para a lhama (`minecraft:llama`). O camelo é o exemplo de animal que já sobrescreve os métodos do jogo; o tatu, de animal que não sobrescreve alguns deles.
 
 1. **Ler o animal vanilla**:
    - a classe base (é um `Animal`?)
@@ -112,12 +132,13 @@ Exemplo para a lhama (`minecraft:llama`).
    - implementa `ModCreature` e cria o `AnimalTraits` na primeira chamada de `mobmod$traits()`
    - define os três `EntityDataAccessor` com a classe vanilla
    - injeta nos mesmos métodos e confere o tipo para deixar subclasses de fora
+   - método que a classe vanilla não declara (só herda) não aceita injeção: acrescente o override no mixin chamando `super`, como o `finalizeSpawn` e o `canMate` do tatu
    - se a classe sobrescreve `baseTick`, chame `beforeBaseTick()`; senão silencie o `getAmbientSound` dormindo, como no camelo
    - registre o mixin em `mobmod.mixins.json`
 3. **Curas vanilla**: desligue as que não forem a regeneração do mod, como no `AbstractHorseMixin`.
 4. **Sono**:
    - IA de goals: adicione o `SleepGoal`. Ele recebe um `ModAnimal`; generalize para `Mob & ModCreature` se precisar.
-   - Brain: crie um `<Animal>Sleep` com o `SleepSchedule`, como o `CamelSleep`, e bloqueie os comportamentos vanilla que o acordariam.
+   - Brain: crie um `<Animal>Sleep` com o `SleepSchedule`, como o `CamelSleep`, e bloqueie os comportamentos vanilla que o acordariam. Para achá-los, procure no jar do jogo as classes que chamam o método que desfaz a pose (o tatu tinha dois).
    - Prefira uma pose que o jogo já tenha (sentar, deitar).
 5. **Lista**: crie `mob/llama/LlamaAdaptation.java` com o `AdaptedMob` e adicione-o em `ModMobs.ADAPTED`.
 6. **Cliente** (`client/mob/llama/`):

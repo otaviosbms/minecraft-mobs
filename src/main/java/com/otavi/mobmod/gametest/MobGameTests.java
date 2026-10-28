@@ -17,6 +17,7 @@ import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
@@ -440,6 +441,28 @@ public class MobGameTests {
         helper.assertTrue(ModCreature.of(husk) == null, "the camel husk should keep its vanilla behavior");
         helper.assertTrue(ModCreature.of(helper.spawn(EntityTypes.CAMEL, new BlockPos(2, 1, 2))) != null, "the camel should be adapted");
         helper.succeed();
+    }
+
+    /*===============*/
+    /*   ARMADILLO   */
+    /*===============*/
+
+    @GameTest(maxTicks = 200)
+    public void armadilloRollsUpToSleepAndRollsOutWhenItWakes(GameTestHelper helper) {
+        sandFloor(helper);
+        var armadillo = helper.spawn(EntityTypes.ARMADILLO, new BlockPos(2, 1, 2));
+        // Lets it land first: it only sleeps on the ground
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(creature(armadillo).fallAsleep(), "armadillo could not fall asleep");
+            helper.assertTrue(armadillo.isScared(), "a sleeping armadillo should roll up");
+            // Past the roll-up animation it is fully in its shell, and stays there while it sleeps
+            helper.runAfterDelay(60, () -> {
+                helper.assertTrue(creature(armadillo).isAsleep(), "the armadillo woke up in its shell");
+                helper.assertTrue(armadillo.getState() == Armadillo.ArmadilloState.SCARED, "the sleeping armadillo is not rolled up: " + armadillo.getState());
+                creature(armadillo).wakeUp();
+                helper.succeedWhen(() -> helper.assertFalse(armadillo.isScared(), "the armadillo stayed rolled up after waking up"));
+            });
+        });
     }
 
     private static void sandFloor(GameTestHelper helper) {

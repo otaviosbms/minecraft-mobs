@@ -1,5 +1,6 @@
 package com.otavi.mobmod.client.core;
 
+import com.otavi.mobmod.client.mob.armadillo.ArmadilloClient;
 import com.otavi.mobmod.client.mob.camel.CamelClient;
 import com.otavi.mobmod.client.mob.chimpanzee.ChimpanzeeClient;
 import com.otavi.mobmod.client.mob.elephant.ElephantClient;
@@ -24,7 +25,8 @@ public final class ModMobsClient {
             new ChimpanzeeClient(),
             new MeerkatClient(),
             // Adapted vanilla animals
-            new CamelClient()
+            new CamelClient(),
+            new ArmadilloClient()
     );
 
     private ModMobsClient() {

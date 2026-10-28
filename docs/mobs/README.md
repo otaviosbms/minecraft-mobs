@@ -13,6 +13,7 @@ Animais do jogo [adaptados](../projeto/animais-vanilla.md) às regras do mod:
 | Mob | ID | Temperamento | Onde nasce | Vida | Tamanho (fêmea) |
 |---|---|---|---|---|---|
 | [Camelo](camelo.md) | `minecraft:camel` | Passivo (do jogo) | Vilas do deserto | 32 | 1.7 × 2.375 |
+| [Tatu](tatu.md) | `minecraft:armadillo` | Passivo (do jogo) | Savanas e badlands | 12 | 0.7 × 0.65 |
 
 Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md), [regeneracao.md](../projeto/regeneracao.md) e [sono.md](../projeto/sono.md).
 

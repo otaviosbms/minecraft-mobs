@@ -203,8 +203,16 @@ public final class AnimalTraits {
     /*===========*/
 
     public boolean canSleep() {
+        return this.canSleep(true);
+    }
+
+    /**
+     * @param needsGround false for an animal whose sleeping pose changes its hitbox and so lifts it off the ground for
+     *                    a tick (the armadillo rolling up)
+     */
+    public boolean canSleep(boolean needsGround) {
         var owner = this.owner;
-        return owner.isAlive() && owner.onGround() && !owner.isInWater() && owner.getTarget() == null && !owner.isLeashed()
+        return owner.isAlive() && (owner.onGround() || !needsGround) && !owner.isInWater() && owner.getTarget() == null && !owner.isLeashed()
                 && !owner.isInLove() && !owner.isPassenger() && !owner.isVehicle() && this.ticksSinceDamage >= SLEEP_AFTER_DAMAGE_TICKS;
     }
 

@@ -1,5 +1,6 @@
 package com.otavi.mobmod.core;
 
+import com.otavi.mobmod.mob.armadillo.ArmadilloAdaptation;
 import com.otavi.mobmod.mob.camel.CamelAdaptation;
 import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
 import com.otavi.mobmod.mob.elephant.ElephantMob;
@@ -28,7 +29,8 @@ public final class ModMobs {
      * its client side (see docs/projeto/animais-vanilla.md).
      */
     public static final List<AdaptedMob<?>> ADAPTED = List.of(
-            CamelAdaptation.MOB
+            CamelAdaptation.MOB,
+            ArmadilloAdaptation.MOB
     );
 
     private ModMobs() {

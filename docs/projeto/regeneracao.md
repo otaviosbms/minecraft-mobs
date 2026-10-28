@@ -24,6 +24,7 @@ Filhotes também regeneram. Um filhote ferido que recebe comida é curado em vez
 | [Chimpanzé](../mobs/chimpanze.md) | 24 | 0,2 por segundo | 2 min | 2,4 (pouco mais de 1 coração) |
 | [Suricato](../mobs/suricato.md) | 10 | 0,083 por segundo | 2 min | 1 (meio coração) |
 | [Camelo](../mobs/camelo.md) (vanilla) | 32 | 0,27 por segundo | 2 min | 3,2 (pouco mais de 1,5 coração) |
+| [Tatu](../mobs/tatu.md) (vanilla) | 12 | 0,1 por segundo | 2 min | 1,2 (pouco mais de meio coração) |
 
 O macho tem a mesma vida da fêmea; só o tamanho muda.
 
