@@ -134,7 +134,7 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
         super.setupAnim(state);
 
         // Only adult females show the swelling
-        this.swelling.visible = state.sex == Sex.FEMALE && !state.isBaby;
+        this.swelling.visible = state.traits.sex == Sex.FEMALE && !state.isBaby;
 
         float age = state.ageInTicks;
         float pos = state.walkAnimationPos;
@@ -227,9 +227,9 @@ public class ChimpanzeeModel extends EntityModel<ChimpanzeeRenderState> {
      * up to the chest, arms hugged in front of them, head tucked down and eyes closed. The breathing slows down.
      */
     private void animateSleeping(ChimpanzeeRenderState state, float px) {
-        this.rightEyelid.visible = state.eyesClosed();
-        this.leftEyelid.visible = state.eyesClosed();
-        float sleep = state.sleepAmount;
+        this.rightEyelid.visible = state.traits.eyesClosed();
+        this.leftEyelid.visible = state.traits.eyesClosed();
+        float sleep = state.traits.sleepAmount;
         if (sleep <= 0.0F) {
             return;
         }

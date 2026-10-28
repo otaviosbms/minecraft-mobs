@@ -1,6 +1,6 @@
 # Genética: sexo, reprodução e variantes de pele
 
-Sistema global: todo mob que estende `ModAnimal` (`src/main/java/com/otavi/mobmod/entity/genetics/`) ganha sexo, variante de pele e a barra de informações, sem código extra.
+Sistema global: todo animal do mod ganha sexo, variante de pele e a barra de informações, sem código extra. Vale para quem estende `ModAnimal` (`src/main/java/com/otavi/mobmod/entity/genetics/`) e para os [animais vanilla adaptados](animais-vanilla.md) (o camelo). As regras ficam em `AnimalTraits` (`entity/traits/`), usadas pelos dois através da interface `ModCreature`.
 
 ![Variantes do elefante](../imagens/elefante-variantes.png)
 
@@ -9,15 +9,15 @@ Sistema global: todo mob que estende `ModAnimal` (`src/main/java/com/otavi/mobmo
 | Regra | Como funciona |
 |---|---|
 | Sorteio | 50% macho, 50% fêmea, no spawn natural, por ovo, por comando e no nascimento |
-| Tamanho | Machos ficam **15% maiores** pelo atributo vanilla `minecraft:scale` (hitbox e modelo crescem juntos). Ajustável por mob sobrescrevendo `ModAnimal.maleScaleBonus()` |
+| Tamanho | Machos ficam **15% maiores** pelo atributo vanilla `minecraft:scale` (hitbox e modelo crescem juntos). Ajustável por mob sobrescrevendo `maleScaleBonus()` (de `ModCreature`) |
 | Visual | Cada mob decide no modelo. No elefante, os machos têm presas longas e as fêmeas presas curtas |
 | Persistência | Salvo no NBT como `Sex: "male"/"female"` e sincronizado com o cliente |
 
 ## Reprodução
 
-Igual à vanilla: alimentar com a comida da tag do mob, love mode, cooldown de 5 minutos, XP e filhote que cresce. A única diferença é que **só um macho e uma fêmea podem acasalar** (`ModAnimal.canMate`). Dois machos ou duas fêmeas apaixonados ficam lado a lado sem gerar filhote.
+Igual à vanilla: alimentar com a comida da tag do mob, love mode, cooldown de 5 minutos, XP e filhote que cresce. A única diferença é que **só um macho e uma fêmea podem acasalar** (`AnimalTraits.isOppositeSex`, chamado no `canMate`). Dois machos ou duas fêmeas apaixonados ficam lado a lado sem gerar filhote.
 
-O filhote é criado em `ModAnimal.getBreedOffspring`, que serve para qualquer mob:
+O filhote é criado no `getBreedOffspring` de cada animal (o do `ModAnimal` ou o vanilla, no caso dos adaptados), e os genes vêm de `AnimalTraits.giveGenesTo`:
 - sexo sorteado (50/50);
 - variante herdada de um dos pais (50% de cada), com mutação (veja abaixo).
 
@@ -52,4 +52,4 @@ Ela substitui o nametag vanilla nesses mobs e usa o mesmo pipeline de renderiza�
 
 ## Mobs que não são animais
 
-`Sex`, `SkinVariant` e a interface `GeneticMob` não dependem de `Animal`. Um mob hostil futuro pode ter uma base própria (ex.: `ModMonster`) que implemente `GeneticMob` com os mesmos dados sincronizados. O `ModMobRenderer` e a barra já funcionam com qualquer `GeneticMob`.
+`Sex`, `SkinVariant` e a interface `GeneticMob` não dependem de `Animal`. Um mob hostil futuro pode ter uma base própria (ex.: `ModMonster`) que implemente `GeneticMob` com os mesmos dados sincronizados. O `ModMobRenderer` e a barra funcionam com qualquer `ModCreature`, inclusive com render states vanilla (veja [animais vanilla](animais-vanilla.md#lado-cliente)).

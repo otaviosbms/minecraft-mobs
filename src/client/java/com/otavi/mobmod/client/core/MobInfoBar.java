@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.otavi.mobmod.entity.genetics.Sex;
 import com.otavi.mobmod.entity.genetics.SkinVariant;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -34,21 +35,21 @@ public final class MobInfoBar {
     private MobInfoBar() {
     }
 
-    static boolean shouldShow(ModMobRenderState state) {
+    static boolean shouldShow(LivingEntityRenderState state) {
         return !state.isInvisible && state.distanceToCameraSq < MAX_DISTANCE * MAX_DISTANCE;
     }
 
-    static void submit(ModMobRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+    static void submit(LivingEntityRenderState state, MobTraitsRenderData traits, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         // Comes down with an animal lying asleep, so it does not float high above it
-        float height = state.boundingBoxHeight * (1.0F - state.sleepAmount * SLEEP_DROP);
+        float height = state.boundingBoxHeight * (1.0F - traits.sleepAmount * SLEEP_DROP);
         var attachment = new Vec3(0.0, height + 0.5, 0.0);
         boolean seeThrough = !state.isDiscrete;
 
         poseStack.pushPose();
-        collector.submitNameTag(poseStack, attachment, 0, healthBar(state.health, state.maxHealth), seeThrough, state.lightCoords, camera);
+        collector.submitNameTag(poseStack, attachment, 0, healthBar(traits.health, traits.maxHealth), seeThrough, state.lightCoords, camera);
         poseStack.translate(0.0F, LINE_HEIGHT, 0.0F);
-        collector.submitNameTag(poseStack, attachment, 0, title(state), seeThrough, state.lightCoords, camera);
-        if (state.sleepAmount >= 1.0F) {
+        collector.submitNameTag(poseStack, attachment, 0, title(traits), seeThrough, state.lightCoords, camera);
+        if (traits.sleepAmount >= 1.0F) {
             poseStack.translate(0.0F, LINE_HEIGHT, 0.0F);
             collector.submitNameTag(poseStack, attachment, 0, snore(state.ageInTicks), seeThrough, state.lightCoords, camera);
         }
@@ -63,12 +64,12 @@ public final class MobInfoBar {
         return Component.literal("z Z z".substring(0, letters * 2 - 1)).withColor(SLEEP_COLOR);
     }
 
-    private static Component title(ModMobRenderState state) {
-        MutableComponent title = state.displayName.copy();
-        if (state.skinVariant != SkinVariant.NORMAL) {
-            title.append(" (").append(Component.translatable(state.skinVariant.translationKey())).append(")");
+    private static Component title(MobTraitsRenderData traits) {
+        MutableComponent title = traits.displayName.copy();
+        if (traits.skinVariant != SkinVariant.NORMAL) {
+            title.append(" (").append(Component.translatable(traits.skinVariant.translationKey())).append(")");
         }
-        boolean male = state.sex == Sex.MALE;
+        boolean male = traits.sex == Sex.MALE;
         return title.append(" ").append(Component.literal(male ? "♂" : "♀").withColor(male ? MALE_COLOR : FEMALE_COLOR));
     }
 

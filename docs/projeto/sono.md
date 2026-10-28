@@ -1,6 +1,6 @@
 # Sono
 
-Sistema global: todo mob que estende `ModAnimal` (`src/main/java/com/otavi/mobmod/entity/genetics/ModAnimal.java`) dorme à noite, sem código extra. O `ModAnimal` adiciona o `SleepGoal` (`entity/goal/SleepGoal.java`) sozinho no construtor, então um mob novo não precisa registrá-lo em `registerGoals()`.
+Sistema global: todo mob que estende `ModAnimal` (`src/main/java/com/otavi/mobmod/entity/genetics/ModAnimal.java`) dorme à noite, sem código extra. O `ModAnimal` adiciona o `SleepGoal` (`entity/goal/SleepGoal.java`) sozinho no construtor, então um mob novo não precisa registrá-lo em `registerGoals()`. Quando dormir e acordar fica no `SleepSchedule` (`entity/traits/`), também usado pelos [animais vanilla adaptados](animais-vanilla.md#sono-em-ia-de-brain) cuja IA é Brain (o [camelo](../mobs/camelo.md) ajoelha para dormir).
 
 ## Regras
 
@@ -36,6 +36,7 @@ O estado é sincronizado com o cliente (`DATA_ASLEEP`) e suavizado entre ticks e
 | [Elefante](../mobs/elefante.md) | Deitado de lado (pose padrão) | Patas da frente um pouco para a frente e as de trás para trás, tromba enrolada para o peito, queixo baixo, orelhas coladas na cabeça, cauda mole e o flanco subindo e descendo devagar com a respiração |
 | [Chimpanzé](../mobs/chimpanze.md) | Encolhido de lado, como no ninho (pose padrão, apoiado no ombro) | Joelhos puxados até o peito, braços abraçados na frente, costas arredondadas, cabeça encolhida para baixo, boca fechada e orelhas paradas |
 | [Suricato](../mobs/suricato.md) | De barriga para baixo, esticado no chão (sem rolar: `applySleepPose` vazio no renderer) | Corpo deitado e rebaixado até a barriga encostar no chão, patas da frente esticadas para a frente com o queixo apoiado nelas, patas de trás esticadas para trás e a cauda enrolada para o lado. Só aparece onde ele não consegue cavar; nos outros lugares dorme na toca |
+| [Camelo](../mobs/camelo.md) (vanilla adaptado) | Ajoelhado: a animação vanilla de sentar (sem rolar: `applySleepPose` vazio) | Pescoço baixo para a frente, olhos fechados. A IA vanilla não o levanta enquanto dorme; ao acordar, levanta com a animação do jogo |
 
 ### Pálpebras
 
@@ -46,6 +47,7 @@ Os olhos são pintados na textura, então cada modelo tem duas pálpebras: placa
 | Elefante | 0x1x2 (nas laterais da cabeça) | (200, 70) | Pele com um vinco escuro no lugar do olho |
 | Chimpanzé | 4x2x0 (na frente, sob a sobrancelha) | (132, 52) | Pálpebra de pele com a linha escura dos cílios embaixo |
 | Suricato | 0x2x2 (nas laterais, dentro da máscara) | (90, 24) | Máscara escura com a linha preta dos cílios embaixo |
+| Camelo (vanilla) | 1x1x2 (+0.05) sobre os olhos do jogo, adulto e filhote | (0, 96) / (8, 96); filhote (0, 54) / (8, 54) | Pintadas em tempo real com a cor do pelo, veja [animais vanilla](animais-vanilla.md#pálpebras-sobre-modelos-vanilla) |
 
 ## Suricato
 
@@ -53,7 +55,7 @@ O [suricato](../mobs/suricato.md) dorme na toca: à noite o `MeerkatBurrowGoal` 
 
 ## Ajustar para um mob
 
-Métodos de `ModAnimal` que qualquer mob pode sobrescrever:
+Métodos de `ModCreature` (e `createSleepGoal()` de `ModAnimal`) que qualquer mob pode sobrescrever:
 
 | Método | Para quê |
 |---|---|
@@ -77,6 +79,6 @@ Para fechar os olhos de um mob novo: adicione as duas pálpebras na cabeça do m
 
 | Teste | O que verifica |
 |---|---|
-| `everyAnimalSleepsAndWakesUpWhenHurt` | Todos os mobs de `ModMobs.ALL` conseguem dormir (o suricato na toca, em areia) e quem pode levar dano acorda ao ser ferido |
+| `everyAnimalSleepsAndWakesUpWhenHurt` | Todos os animais de `ModMobs.allAnimalTypes()` conseguem dormir (o suricato na toca, em areia; o camelo ajoelhado) e quem pode levar dano acorda ao ser ferido |
 
 Para os testes, `fallAsleep()` faz o animal dormir na hora.

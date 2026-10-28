@@ -2,9 +2,9 @@ package com.otavi.mobmod.gametest;
 
 import com.otavi.mobmod.core.ModEntityTypes;
 import com.otavi.mobmod.core.ModMobs;
-import com.otavi.mobmod.entity.genetics.ModAnimal;
 import com.otavi.mobmod.entity.genetics.Sex;
 import com.otavi.mobmod.entity.genetics.SkinVariant;
+import com.otavi.mobmod.entity.traits.ModCreature;
 import com.otavi.mobmod.mob.chimpanzee.ChimpanzeeMob;
 import com.otavi.mobmod.mob.meerkat.Meerkat;
 import com.otavi.mobmod.mob.meerkat.MeerkatMob;
@@ -12,9 +12,12 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
@@ -24,18 +27,22 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
- * Smoke tests that cover every mob in {@link ModMobs#ALL}, so a new mob is tested without writing any test code.
+ * Smoke tests that cover every mob in {@link ModMobs#ALL} and every adapted vanilla animal in {@link ModMobs#ADAPTED},
+ * so a new mob is tested without writing any test code.
  * Run with {@code ./gradlew runGameTestServer}; only loaded when Fabric's game test system is enabled.
  */
 public class MobGameTests {
     @GameTest(maxTicks = 100)
     public void everyMobSpawnsAndSurvives(GameTestHelper helper) {
         var spawned = new ArrayList<Mob>();
-        for (var mob : ModMobs.ALL) {
-            var entity = helper.spawn(mob.type(), new BlockPos(1, 2, 1));
-            helper.assertTrue(entity.getHealth() > 0, mob.name() + " spawned without health");
+        for (var type : ModMobs.allAnimalTypes()) {
+            var entity = (Mob) helper.spawn(type, new BlockPos(1, 2, 1));
+            helper.assertTrue(entity.getHealth() > 0, type.toShortString() + " spawned without health");
+            helper.assertTrue(ModCreature.of(entity) != null, type.toShortString() + " does not follow the rules of the mod");
             spawned.add(entity);
         }
         helper.runAfterDelay(40, () -> {
@@ -65,8 +72,8 @@ public class MobGameTests {
         for (var animal : spawnAnimals(helper)) {
             var male = animal[0];
             var female = animal[1];
-            male.setSex(Sex.MALE);
-            female.setSex(Sex.FEMALE);
+            creature(male).setSex(Sex.MALE);
+            creature(female).setSex(Sex.FEMALE);
             helper.assertTrue(male.getScale() > female.getScale(), male.getType().toShortString() + " males should be bigger than females");
         }
         helper.succeed();
@@ -80,11 +87,11 @@ public class MobGameTests {
             first.setInLove(null);
             second.setInLove(null);
 
-            first.setSex(Sex.MALE);
-            second.setSex(Sex.MALE);
+            creature(first).setSex(Sex.MALE);
+            creature(second).setSex(Sex.MALE);
             helper.assertTrue(!first.canMate(second), "two " + first.getType().toShortString() + " males should not mate");
 
-            second.setSex(Sex.FEMALE);
+            creature(second).setSex(Sex.FEMALE);
             helper.assertTrue(first.canMate(second) && second.canMate(first), first.getType().toShortString() + " male and female should mate");
         }
         helper.succeed();
@@ -95,11 +102,11 @@ public class MobGameTests {
         for (var animal : spawnAnimals(helper)) {
             var father = animal[0];
             var mother = animal[1];
-            father.setSkinVariant(SkinVariant.ALBINO);
-            mother.setSkinVariant(SkinVariant.ALBINO);
+            creature(father).setSkinVariant(SkinVariant.ALBINO);
+            creature(mother).setSkinVariant(SkinVariant.ALBINO);
             // Two albino parents never have a normal calf: it is albino, or a mutation (albino/melanistic)
             for (int i = 0; i < 20; i++) {
-                var calf = (ModAnimal) father.getBreedOffspring(helper.getLevel(), mother);
+                var calf = ModCreature.of(father.getBreedOffspring(helper.getLevel(), mother));
                 helper.assertTrue(calf != null && calf.getSkinVariant() != SkinVariant.NORMAL, father.getType().toShortString() + " calf lost its parents' variant");
             }
         }
@@ -108,13 +115,13 @@ public class MobGameTests {
 
     @GameTest(maxTicks = 100)
     public void injuredMobsRegenerateOutOfCombat(GameTestHelper helper) {
-        var injured = new ArrayList<ModAnimal>();
+        var injured = new ArrayList<Animal>();
         for (var animal : spawnAnimals(helper)) {
             var mob = animal[0];
             animal[1].discard();
             mob.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), mob.getMaxHealth() / 2);
             // Skip the delay after the damage
-            mob.setTicksSinceDamage(Integer.MAX_VALUE / 2);
+            creature(mob).setTicksSinceDamage(Integer.MAX_VALUE / 2);
             injured.add(mob);
         }
         float[] before = new float[injured.size()];
@@ -135,7 +142,7 @@ public class MobGameTests {
 
     @GameTest(maxTicks = 100)
     public void mobsDoNotRegenerateRightAfterDamage(GameTestHelper helper) {
-        var injured = new ArrayList<ModAnimal>();
+        var injured = new ArrayList<Animal>();
         for (var animal : spawnAnimals(helper)) {
             animal[1].discard();
             animal[0].hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), animal[0].getMaxHealth() / 2);
@@ -157,23 +164,29 @@ public class MobGameTests {
     @GameTest
     public void foodHealsInjuredMobs(GameTestHelper helper) {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var foods = new ArrayList<Map.Entry<EntityType<?>, Item>>();
         for (var definition : ModMobs.ALL) {
-            if (definition.food() == null || definition.food().items().isEmpty()) {
-                continue;
+            if (definition.food() != null && !definition.food().items().isEmpty()) {
+                foods.add(Map.entry(definition.type(), definition.food().items().getFirst()));
             }
-            var mob = helper.spawn(definition.type(), new BlockPos(1, 0, 1));
-            if (!(mob instanceof ModAnimal animal)) {
+        }
+        for (var adapted : ModMobs.ADAPTED) {
+            foods.add(Map.entry(adapted.type(), adapted.sampleFood()));
+        }
+        for (var food : foods) {
+            var name = food.getKey().toShortString();
+            if (!(helper.spawn(food.getKey(), new BlockPos(1, 0, 1)) instanceof Animal animal)) {
                 continue;
             }
             animal.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), animal.getMaxHealth() / 2);
             float before = animal.getHealth();
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(definition.food().items().getFirst(), 2));
+            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(food.getValue(), 2));
             animal.mobInteract(player, InteractionHand.MAIN_HAND);
             float expected = animal.getMaxHealth() * 0.1F;
             helper.assertTrue(Math.abs(animal.getHealth() - before - expected) < 0.01F,
-                    definition.name() + " healed " + (animal.getHealth() - before) + " instead of " + expected);
-            helper.assertTrue(!animal.isInLove(), definition.name() + " fell in love instead of just eating");
-            helper.assertTrue(player.getMainHandItem().getCount() == 1, definition.name() + " did not eat exactly one item");
+                    name + " healed " + (animal.getHealth() - before) + " instead of " + expected);
+            helper.assertTrue(!animal.isInLove(), name + " fell in love instead of just eating");
+            helper.assertTrue(player.getMainHandItem().getCount() == 1, name + " did not eat exactly one item");
         }
         helper.succeed();
     }
@@ -182,23 +195,23 @@ public class MobGameTests {
     public void everyAnimalSleepsAndWakesUpWhenHurt(GameTestHelper helper) {
         // Sand, so the meerkat sleeps in its burrow
         sandFloor(helper);
-        var animals = new ArrayList<ModAnimal>();
-        for (var mob : ModMobs.ALL) {
-            if (helper.spawn(mob.type(), new BlockPos(2, 1, 2)) instanceof ModAnimal animal) {
+        var animals = new ArrayList<Animal>();
+        for (var type : ModMobs.allAnimalTypes()) {
+            if (helper.spawn(type, new BlockPos(2, 1, 2)) instanceof Animal animal) {
                 animals.add(animal);
             }
         }
         helper.runAfterDelay(5, () -> {
             for (var animal : animals) {
-                helper.assertTrue(animal.fallAsleep(), animal.getType().toShortString() + " could not fall asleep");
+                helper.assertTrue(creature(animal).fallAsleep(), animal.getType().toShortString() + " could not fall asleep");
             }
             // Long enough for the meerkat to dig in
             helper.runAfterDelay(Meerkat.DIG_LENGTH + 5, () -> {
                 for (var animal : animals) {
-                    helper.assertTrue(animal.isAsleep(), animal.getType().toShortString() + " is not asleep");
+                    helper.assertTrue(creature(animal).isAsleep(), animal.getType().toShortString() + " is not asleep");
                     // An animal hidden in its burrow cannot be hurt, so it sleeps on
                     if (animal.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 1.0F)) {
-                        helper.assertFalse(animal.isAsleep(), animal.getType().toShortString() + " kept sleeping after being hurt");
+                        helper.assertFalse(creature(animal).isAsleep(), animal.getType().toShortString() + " kept sleeping after being hurt");
                     }
                 }
                 helper.succeed();
@@ -400,6 +413,35 @@ public class MobGameTests {
         });
     }
 
+    /*===========*/
+    /*   CAMEL   */
+    /*===========*/
+
+    @GameTest(maxTicks = 200)
+    public void camelKneelsToSleepAndGetsUpWhenItWakes(GameTestHelper helper) {
+        sandFloor(helper);
+        var camel = helper.spawn(EntityTypes.CAMEL, new BlockPos(2, 1, 2));
+        // Lets it land first: it only sleeps on the ground
+        helper.runAfterDelay(20, () -> {
+            helper.assertTrue(creature(camel).fallAsleep(), "camel could not fall asleep");
+            helper.assertTrue(camel.isCamelSitting(), "a sleeping camel should kneel");
+            // The vanilla AI sits and stands at random: asleep, it must stay down
+            helper.runAfterDelay(80, () -> {
+                helper.assertTrue(creature(camel).isAsleep() && camel.isCamelSitting(), "the camel got up in its sleep");
+                creature(camel).wakeUp();
+                helper.succeedWhen(() -> helper.assertFalse(camel.isCamelSitting(), "the camel stayed down after waking up"));
+            });
+        });
+    }
+
+    @GameTest
+    public void camelHuskIsNotAdapted(GameTestHelper helper) {
+        var husk = helper.spawn(EntityTypes.CAMEL_HUSK, new BlockPos(2, 1, 2));
+        helper.assertTrue(ModCreature.of(husk) == null, "the camel husk should keep its vanilla behavior");
+        helper.assertTrue(ModCreature.of(helper.spawn(EntityTypes.CAMEL, new BlockPos(2, 1, 2))) != null, "the camel should be adapted");
+        helper.succeed();
+    }
+
     private static void sandFloor(GameTestHelper helper) {
         for (int x = 0; x < 5; x++) {
             for (int z = 0; z < 6; z++) {
@@ -409,17 +451,21 @@ public class MobGameTests {
     }
 
     /**
-     * Two adults of every animal in {@link ModMobs#ALL}.
+     * Two adults of every animal that follows the rules of the mod, made from scratch or adapted.
      */
-    private static List<ModAnimal[]> spawnAnimals(GameTestHelper helper) {
-        var pairs = new ArrayList<ModAnimal[]>();
-        for (var mob : ModMobs.ALL) {
-            var first = helper.spawn(mob.type(), new BlockPos(1, 2, 1));
-            var second = helper.spawn(mob.type(), new BlockPos(1, 2, 1));
-            if (first instanceof ModAnimal a && second instanceof ModAnimal b) {
-                pairs.add(new ModAnimal[]{a, b});
+    private static List<Animal[]> spawnAnimals(GameTestHelper helper) {
+        var pairs = new ArrayList<Animal[]>();
+        for (var type : ModMobs.allAnimalTypes()) {
+            var first = helper.spawn(type, new BlockPos(1, 2, 1));
+            var second = helper.spawn(type, new BlockPos(1, 2, 1));
+            if (first instanceof Animal a && second instanceof Animal b && ModCreature.of(a) != null && ModCreature.of(b) != null) {
+                pairs.add(new Animal[]{a, b});
             }
         }
         return pairs;
+    }
+
+    private static ModCreature creature(Animal animal) {
+        return Objects.requireNonNull(ModCreature.of(animal), animal.getType().toShortString() + " is not a mod creature");
     }
 }

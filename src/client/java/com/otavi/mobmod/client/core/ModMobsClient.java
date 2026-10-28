@@ -1,5 +1,6 @@
 package com.otavi.mobmod.client.core;
 
+import com.otavi.mobmod.client.mob.camel.CamelClient;
 import com.otavi.mobmod.client.mob.chimpanzee.ChimpanzeeClient;
 import com.otavi.mobmod.client.mob.elephant.ElephantClient;
 import com.otavi.mobmod.client.mob.meerkat.MeerkatClient;
@@ -21,7 +22,9 @@ public final class ModMobsClient {
     public static final List<ClientMob> ALL = List.of(
             new ElephantClient(),
             new ChimpanzeeClient(),
-            new MeerkatClient()
+            new MeerkatClient(),
+            // Adapted vanilla animals
+            new CamelClient()
     );
 
     private ModMobsClient() {
@@ -40,5 +43,6 @@ public final class ModMobsClient {
             }
         };
         ALL.forEach(mob -> mob.register(registrar));
+        VanillaVariantTextures.init();
     }
 }

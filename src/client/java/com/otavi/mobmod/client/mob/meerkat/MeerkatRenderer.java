@@ -37,7 +37,7 @@ public class MeerkatRenderer extends ModMobRenderer<Meerkat, MeerkatRenderState,
         state.burrowDepth = meerkat.getBurrowDepth(partialTick);
         var burrow = meerkat.getBurrowState();
         state.digging = burrow == Meerkat.BurrowState.DIGGING || burrow == Meerkat.BurrowState.EMERGING;
-        state.showInfoBar &= state.burrowDepth == 0.0F;
+        state.traits.showInfoBar &= state.burrowDepth == 0.0F;
     }
 
     @Override

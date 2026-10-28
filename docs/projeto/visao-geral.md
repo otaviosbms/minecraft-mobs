@@ -1,6 +1,6 @@
 # Visão geral do projeto
 
-Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona três mobs, cada um com ovo de spawn: o **Elefante** (`mobmod:elephant`), o **Chimpanzé** (`mobmod:chimpanzee`) e o **Suricato** (`mobmod:meerkat`). As fichas completas estão em [docs/mobs](../mobs/README.md). Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
+Mod de mobs para Minecraft **26.3** usando **Fabric** (Loom `1.18-SNAPSHOT`, Fabric Loader `0.19.5`, Fabric API `0.161.0+26.3`), **Java 25**, mapeamentos Mojang. Hoje o mod adiciona três mobs, cada um com ovo de spawn: o **Elefante** (`mobmod:elephant`), o **Chimpanzé** (`mobmod:chimpanzee`) e o **Suricato** (`mobmod:meerkat`), e adapta um animal do jogo às mesmas regras: o **Camelo** (`minecraft:camel`, veja [animais-vanilla.md](animais-vanilla.md)). As fichas completas estão em [docs/mobs](../mobs/README.md). Todos os animais têm sexo, variantes de pele (normal, albino, melânico) e uma barra de informações.
 
 A arquitetura foi pensada para **dezenas de mobs**: cada mob vive no seu próprio pacote e é declarado uma única vez numa `MobDefinition`; o resto (registro, spawn, aba criativa, traduções, loot, tags, modelos de item e testes) é derivado dessa definição. Para o passo a passo, veja [como-adicionar-um-mob.md](como-adicionar-um-mob.md).
 
@@ -40,10 +40,13 @@ minecraft-mobs/
 | `core/ModItems.java` | Itens que não são ovos (ex.: fezes), com nome, aba criativa e modelo gerados pelo datagen |
 | `core/ModEntityTypes.java` | Entidades que não são mobs (ex.: o projétil das fezes) |
 | `item/<nome>/` | Um pacote por item com comportamento próprio (ex.: `item/feces/`: item e projétil) |
-| `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais, com reprodução macho + fêmea, regeneração de vida e sono). Veja [genetica.md](genetica.md), [regeneracao.md](regeneracao.md) e [sono.md](sono.md) |
+| `entity/genetics/` | Sistema global de genética: `Sex`, `SkinVariant`, `GeneticMob` e `ModAnimal` (base dos animais criados do zero, com reprodução macho + fêmea, regeneração de vida e sono). Veja [genetica.md](genetica.md), [regeneracao.md](regeneracao.md) e [sono.md](sono.md) |
+| `entity/traits/` | As regras desses sistemas, escritas uma vez: `ModCreature` (interface de todo animal do mod, criado ou adaptado), `AnimalTraits` (estado e lógica) e `SleepSchedule`. Veja [animais-vanilla.md](animais-vanilla.md) |
+| `core/AdaptedMob.java` | Um animal vanilla adaptado às regras do mod; a lista fica em `ModMobs.ADAPTED` |
+| `mixin/` | Mixins que adaptam animais vanilla (o camelo), registrados em `resources/mobmod.mixins.json` |
 | `entity/goal/` | Goals de IA reaproveitáveis por vários mobs (`AdultMeleeAttackGoal`, `BabyPanicGoal`, `SleepGoal`) |
 | `mob/<nome>/` | Um pacote por mob: a classe da entidade e o `<Nome>Mob` com a `MobDefinition` |
-| `gametest/MobGameTests.java` | Testes que percorrem `ModMobs.ALL`: spawn, loot table, tamanho do macho, acasalamento só entre sexos opostos e herança de variante |
+| `gametest/MobGameTests.java` | Testes que percorrem `ModMobs.allAnimalTypes()` (criados e adaptados): spawn, tamanho do macho, acasalamento só entre sexos opostos, herança de variante, regeneração, comida e sono; e `ModMobs.ALL` para as loot tables |
 
 ## Código do cliente (`src/client/java/com/otavi/mobmod/client`)
 

@@ -3,7 +3,7 @@
   "id": "mobmod",
   "version": "${version}",
   "name": "Minecraft Mobs",
-  "description": "Adds an elephant to the savannas.",
+  "description": "Adds realistic animals (elephant, chimpanzee, meerkat) and adapts vanilla ones (camel) to the same rules: sexes, skin variants, regeneration and sleep.",
   "authors": [
     "Otavi"
   ],
@@ -24,6 +24,9 @@
     ]
   },
   "accessWidener": "mobmod.accesswidener",
+  "mixins": [
+    "mobmod.mixins.json"
+  ],
   "depends": {
     "minecraft": "~26.3-",
     "fabricloader": ">=0.19.5",

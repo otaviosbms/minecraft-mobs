@@ -162,7 +162,7 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
         float bob = Math.abs(Mth.sin(pos * 1.2F)) * speed * fours;
 
         // Asleep it lies flat on its belly, so the body pitches all the way down and sinks onto the ground
-        float sleep = state.sleepAmount;
+        float sleep = state.traits.sleepAmount;
         float awake = 1.0F - sleep;
         float drop = SLEEP_DROP * sleep * px;
         this.body.xRot = Mth.lerp(sleep, WALK_PITCH * fours, SLEEP_PITCH);
@@ -231,8 +231,8 @@ public class MeerkatModel extends EntityModel<MeerkatRenderState> {
      * eyes closed. In the wild they sleep in their burrows; this pose is for ground too hard to dig.
      */
     private void animateSleeping(MeerkatRenderState state, float sleep, float px) {
-        this.rightEyelid.visible = state.eyesClosed();
-        this.leftEyelid.visible = state.eyesClosed();
+        this.rightEyelid.visible = state.traits.eyesClosed();
+        this.leftEyelid.visible = state.traits.eyesClosed();
         if (sleep <= 0.0F) {
             return;
         }

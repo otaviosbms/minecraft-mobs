@@ -2,3 +2,7 @@ accessWidener	v1	official
 
 # Fabric has no event for spawn placements, so the vanilla registration method is opened instead (same as Promenade)
 accessible	method	net/minecraft/world/entity/SpawnPlacements	register	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacementType;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V
+
+# Adapted camel: its renderer reuses the vanilla saddle layer, and its calf model reuses the vanilla calf mesh
+accessible	method	net/minecraft/client/renderer/entity/CamelRenderer	createCamelSaddleLayer	(Lnet/minecraft/client/renderer/entity/EntityRendererProvider$Context;Lnet/minecraft/client/renderer/entity/MobRenderer;Lnet/minecraft/client/resources/model/EquipmentClientInfo$LayerType;Lnet/minecraft/client/model/geom/ModelLayerLocation;)Lnet/minecraft/client/renderer/entity/layers/SimpleEquipmentLayer;
+accessible	field	net/minecraft/client/model/geom/builders/LayerDefinition	mesh	Lnet/minecraft/client/model/geom/builders/MeshDefinition;

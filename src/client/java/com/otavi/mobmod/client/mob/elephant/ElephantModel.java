@@ -143,7 +143,7 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
         // Resets every part to its default pose: rotations below are relative to it
         super.setupAnim(state);
 
-        boolean male = state.sex == Sex.MALE;
+        boolean male = state.traits.sex == Sex.MALE;
         this.rightTusk.visible = !male;
         this.leftTusk.visible = !male;
         this.rightLongTusk.visible = male;
@@ -165,7 +165,7 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
         this.rightFrontLeg.xRot = -swing;
 
         // Idle: trunk sways along its whole length, ears fan, tail swishes (all of it stops while asleep)
-        float sleep = state.sleepAmount;
+        float sleep = state.traits.sleepAmount;
         float awake = 1.0F - sleep;
         this.trunk.xRot += (Mth.sin(age * 0.05F) * 0.06F + swing * 0.2F) * awake;
         this.trunk.zRot = Mth.cos(age * 0.04F) * 0.05F * awake;
@@ -197,8 +197,8 @@ public class ElephantModel extends EntityModel<ElephantRenderState> {
      * and the eyes close. The body swells slowly with deep breaths.
      */
     private void animateSleeping(ElephantRenderState state, float sleep, float age) {
-        this.rightEyelid.visible = state.eyesClosed();
-        this.leftEyelid.visible = state.eyesClosed();
+        this.rightEyelid.visible = state.traits.eyesClosed();
+        this.leftEyelid.visible = state.traits.eyesClosed();
         if (sleep <= 0.0F) {
             return;
         }

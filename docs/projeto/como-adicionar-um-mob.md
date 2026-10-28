@@ -1,5 +1,7 @@
 # Como adicionar um mob
 
+Este guia é para um mob criado do zero. Para adaptar um animal que já existe no jogo, veja [animais-vanilla.md](animais-vanilla.md).
+
 Exemplo para um mob chamado `zebra`. Use o Elefante (`mob/elephant`) como referência completa.
 
 ## 1. Lado comum: `src/main/java/com/otavi/mobmod/mob/zebra/`

@@ -8,7 +8,13 @@ Ficha completa de cada mob do mod: atributos, IA, reprodução, variantes, spawn
 | [Chimpanzé](chimpanze.md) | `mobmod:chimpanzee` | Neutro | Selvas | 24 | 0.8 × 1.05 |
 | [Suricato](suricato.md) | `mobmod:meerkat` | Neutro | Desertos | 10 | 0.4 × 0.6 |
 
-Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md).
+Animais do jogo [adaptados](../projeto/animais-vanilla.md) às regras do mod:
+
+| Mob | ID | Temperamento | Onde nasce | Vida | Tamanho (fêmea) |
+|---|---|---|---|---|---|
+| [Camelo](camelo.md) | `minecraft:camel` | Passivo (do jogo) | Vilas do deserto | 32 | 1.7 × 2.375 |
+
+Regras que valem para todos os mobs (sexo, reprodução, variantes de pele e barra de informações) estão em [genetica.md](../projeto/genetica.md), [regeneracao.md](../projeto/regeneracao.md) e [sono.md](../projeto/sono.md).
 
 Itens do mod: as **fezes** (`mobmod:feces`), jogadas pelos chimpanzés, estão documentadas na [ficha do Chimpanzé](chimpanze.md#fezes).
 
